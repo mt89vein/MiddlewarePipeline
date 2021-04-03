@@ -12,8 +12,8 @@
     <PackageId>MiddlewarePipeline</PackageId>
     <PackageTags>middleware, custom pipeline</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/mt89vein/Middlewares</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/mt89vein/Middlewares</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mt89vein/MiddlewarePipeline</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/mt89vein/MiddlewarePipeline</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
