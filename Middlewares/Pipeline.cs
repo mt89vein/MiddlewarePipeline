@@ -69,7 +69,7 @@ namespace Middlewares
                     return type.NextFunc(_serviceProvider, _ => action())(parameter);
                 }
 
-                throw new InvalidOperationException("Undefined execution path.");
+                throw new InvalidOperationException("Invalid pipeline component. No middlware or delegate supplied.");
             };
 
             return action();
