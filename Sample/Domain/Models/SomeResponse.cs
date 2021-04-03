@@ -7,7 +7,7 @@ namespace Domain.Models
     {
         public SubDomainType Type { get; set; }
 
-        public List<DocumentDetails> Documents { get; set; }
+        public List<DocumentDetails> Documents { get; set; } = new();
 
         public bool? IsValid { get; set; }
 

@@ -4,6 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <Description>Set of classes and interfaces for configuring and executing custom pipeline using middleware pattern.</Description>
+    <AssemblyName>Middlewares</AssemblyName>
+    <Version>1.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageId>MiddlewarePipeline</PackageId>
+    <PackageTags>middleware, custom pipeline</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/mt89vein/Middlewares</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/mt89vein/Middlewares</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
