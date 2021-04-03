@@ -7,7 +7,7 @@ If you familiar with ASP.NET Core HttpContext pipeline and middlewares, then you
 
 [![NuGet version (MiddlewarePipeline)](https://img.shields.io/nuget/v/MiddlewarePipeline.svg?style=flat-square)](https://www.nuget.org/packages/MiddlewarePipeline)
 ![UnitTest](https://github.com/mt89vein/MiddlewarePipeline/workflows/UnitTest/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/mt89vein/MiddlewarePipeline/badge.svg?branch=master)](https://coveralls.io/github/mt89vein/MiddlewarePipeline?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/mt89vein/MiddlewarePipeline/badge.svg?branch=master&v=1)](https://coveralls.io/github/mt89vein/MiddlewarePipeline?branch=master)
 
 Look at tests for additional examples.
 
