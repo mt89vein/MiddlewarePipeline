@@ -110,5 +110,17 @@ namespace Middlewares.Tests
             // assert
             Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
+
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentArgType()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponents<TestCtx>(nextMiddlewareType: null!));
+        }
+
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentArgFunc()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponents<TestCtx>(nextFunc: null!));
+        }
     }
 }
