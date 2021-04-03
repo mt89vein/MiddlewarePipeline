@@ -17,7 +17,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> ConfigurePipelineFor<TParameter>(
             this IServiceCollection services,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton
+            ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
         ) where TParameter : class
         {
             var builder = new PipelineBuilder<TParameter>();

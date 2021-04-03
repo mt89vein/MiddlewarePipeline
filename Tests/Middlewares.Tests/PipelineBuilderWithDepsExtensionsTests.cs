@@ -1,11 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Middlewares;
+using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using UnitTests.TestMiddlewares;
 
-namespace UnitTests
+namespace Middlewares.Tests
 {
     [TestOf(typeof(PipelineBuilderWithDepsExtensions))]
     public class PipelineBuilderWithDepsExtensionsTests
@@ -13,13 +12,18 @@ namespace UnitTests
         [Test]
         public void Cannot_Register_Invalid_Func_WithSingleDep()
         {
+            // arrange
             var services = new ServiceCollection();
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
             Func<TestCtx, ExampleDependency, Func<Task>, Task> middleware = null;
 
-            Assert.Throws<ArgumentNullException>(() => pipelineBuilder.Use(middleware!));
+            // act
+            void TestCode() => pipelineBuilder.Use(middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
         }
 
         [Test]
@@ -57,13 +61,18 @@ namespace UnitTests
         [Test]
         public void Cannot_Register_Invalid_Func_WithTwoDeps()
         {
+            // arrange
             var services = new ServiceCollection();
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
             Func<TestCtx, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
 
-            Assert.Throws<ArgumentNullException>(() => pipelineBuilder.Use(middleware!));
+            // act
+            void TestCode() => pipelineBuilder.Use(middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
         }
 
         [Test]
@@ -103,13 +112,18 @@ namespace UnitTests
         [Test]
         public void Cannot_Register_Invalid_Func_WithThreeDeps()
         {
+            // arrange
             var services = new ServiceCollection();
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
             Func<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
 
-            Assert.Throws<ArgumentNullException>(() => pipelineBuilder.Use(middleware!));
+            // act
+            void TestCode() => pipelineBuilder.Use(middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
         }
 
         [Test]

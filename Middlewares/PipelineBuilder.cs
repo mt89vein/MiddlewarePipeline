@@ -55,10 +55,7 @@ namespace Middlewares
                 );
             }
 
-            _pipelineComponents.Add(new PipelineComponents<TParameter>
-            {
-                NextMiddlewareType = middlewareType
-            });
+            _pipelineComponents.Add(new PipelineComponents<TParameter>(middlewareType));
 
             return this;
         }
@@ -76,10 +73,7 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            _pipelineComponents.Add(new PipelineComponents<TParameter>
-            {
-                NextFunc = middleware
-            });
+            _pipelineComponents.Add(new PipelineComponents<TParameter>(middleware));
 
             return this;
         }

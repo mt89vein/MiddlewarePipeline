@@ -1,10 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Middlewares;
+using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System.Threading.Tasks;
-using UnitTests.TestMiddlewares;
 
-namespace UnitTests
+namespace Middlewares.Tests
 {
     [TestOf(typeof(ServiceCollectionExtensions))]
     public class ConfigurePipelineForTests
@@ -45,13 +44,16 @@ namespace UnitTests
         [Test]
         public void PipelineAccessor_CanBeResolved()
         {
+            // arrange
             var services = new ServiceCollection();
             services.ConfigurePipelineFor<TestCtx>();
 
             var sp = services.BuildServiceProvider();
 
+            // act
             var pipelineInfoAccessor = sp.GetService<IPipelineInfoAccessor<TestCtx>>();
 
+            // assert
             Assert.IsNotNull(pipelineInfoAccessor, "Pipeline accessor could not be resolved");
         }
     }

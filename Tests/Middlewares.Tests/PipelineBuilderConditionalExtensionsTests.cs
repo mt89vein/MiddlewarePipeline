@@ -1,11 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Middlewares;
+using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using UnitTests.TestMiddlewares;
 
-namespace UnitTests
+namespace Middlewares.Tests
 {
     [TestOf(typeof(PipelineBuilderConditionalExtensions))]
     public class PipelineBuilderConditionalExtensionsTests
@@ -105,13 +104,18 @@ namespace UnitTests
         [Test]
         public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate()
         {
+            // arrange
             var services = new ServiceCollection();
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
             Func<IServiceProvider, TestCtx, Func<Task>, Task> middleware = null;
 
-            Assert.Throws<ArgumentNullException>(() => pipelineBuilder.UseWhen(_ => true, middleware!));
+            // act
+            void TestCode() => pipelineBuilder.UseWhen(_ => true, middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
         }
     }
 }

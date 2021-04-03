@@ -1,4 +1,4 @@
-namespace UnitTests.TestMiddlewares
+namespace Middlewares.Tests.TestMiddlewares
 {
     public class ExampleDependency
     {

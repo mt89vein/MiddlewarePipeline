@@ -1,7 +1,6 @@
-using Middlewares;
 using System.Threading.Tasks;
 
-namespace UnitTests.TestMiddlewares
+namespace Middlewares.Tests.TestMiddlewares
 {
     public class Middleware1 : IMiddleware<TestCtx>
     {

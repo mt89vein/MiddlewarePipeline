@@ -1,13 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
-using Middlewares;
+using Middlewares.Tests.TestMiddlewares;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnitTests.TestMiddlewares;
 
-namespace UnitTests
+namespace Middlewares.Tests
 {
     /// <summary>
     /// Pipeline execution order tests.
@@ -95,20 +94,21 @@ namespace UnitTests
         [Test]
         public void Should_Throw_If_Invalid_Component()
         {
+            // arrange
             var pipelineInfoAccessorMock = new Mock<IPipelineInfoAccessor<TestCtx>>();
             pipelineInfoAccessorMock.Setup(d => d.PipelineComponents)
                 .Returns(new List<PipelineComponents<TestCtx>>
                 {
-                    new()
-                    {
-                        NextMiddlewareType = null,
-                        NextFunc = null
-                    }
+                    new() // invalid instance
                 });
 
             var pipeline = new Pipeline<TestCtx>(null!, pipelineInfoAccessorMock.Object);
 
-            Assert.ThrowsAsync<InvalidOperationException>(() => pipeline.ExecuteAsync(new TestCtx()));
+            // act
+            Task TestCode() => pipeline.ExecuteAsync(new TestCtx());
+
+            // assert
+            Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
     }
 }
