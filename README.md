@@ -199,6 +199,29 @@ services.ConfigurePipelineFor<Param>()
     /* other middlewares */
 ```
 
+### Manually build pipeline
+
+if you want to build of pipeline manually (e.g. for conditional execution)
+you can use this snippet:
+
+```csharp
+/// <summary>
+/// Creates pipeline from current components.
+/// </summary>
+/// <param name="sp">Application service provider.</param>
+private static IPipeline<Param> BuildPipeline(IServiceProvider sp)
+{
+    var pipeline = new PipelineBuilder<Param>();
+
+    pipeline
+        .Use<Middleware1>()
+        .Use<Middleware2>();
+        /* chain other middlewares */
+
+    return pipeline.Build(sp);
+}
+```
+
 ### Contribute
 
 Feel free for creation issues, or PR :)

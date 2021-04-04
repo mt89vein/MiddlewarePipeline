@@ -26,6 +26,10 @@ namespace Domain.Subdomain1
             });
         }
 
+        /// <summary>
+        /// Creates pipeline from current components.
+        /// </summary>
+        /// <param name="sp">Application service provider.</param>
         private static IPipeline<SomeContext> BuildPipeline(IServiceProvider sp)
         {
             var pipeline = new PipelineBuilder<SomeContext>();
