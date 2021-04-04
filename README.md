@@ -66,6 +66,8 @@ services.ConfigurePipelineFor<Param>()
         .UseWhen<Param, SecondMiddleware>(p => p.Type = SubDomainType.Second)
         .Use<CommonFinalyzeMiddleware>(); // finalization of pipeline
 
+// as you can see, it is very easy to add custom logic in any part of request execution
+
 // execution pipeline looks like this:
 // 1. Before next() delegate in CommonMiddleware
 // 2. Before next() delegate in SubdomainDetectMiddleware
@@ -106,6 +108,8 @@ public class ExampleController : ControllerBase
 }
 ```
 
+If you need pipeline branching, you can extend it with building your own pipeline using PipelineBuilder class, create Pipeline class from it, and execute.
+
 look at [ServiceCollectionExtensions.cs](https://github.com/mt89vein/MiddlewarePipeline/blob/master/Sample/Application/ServiceCollectionExtensions.cs) for more advanced examples
 
 ## Features
@@ -114,6 +118,7 @@ look at [ServiceCollectionExtensions.cs](https://github.com/mt89vein/MiddlewareP
 
 ```csharp
 services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
     .Use(async (param, next) =>
     {
         // before
@@ -122,12 +127,14 @@ services.ConfigurePipelineFor<Param>()
 
         // after
     });
+    /* other middlewares */
 ```
 
 ### Lambda as middleware with IServiceProvider
 
 ```csharp
 services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
     .Use((sp, next) =>
     {
         var dep = sp.GetRequiredService<Dependency>();
@@ -143,6 +150,7 @@ services.ConfigurePipelineFor<Param>()
             // after
         };
     });
+    /* other middlewares */
 ```
 
 ### Lambda as middleware with injecting via param
@@ -150,6 +158,7 @@ services.ConfigurePipelineFor<Param>()
 ```csharp
 services.AddTransient<Dependency>();
 services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
     // inject dependencies from DI (up to 3)
     .Use<Param, Dependency>(async (param, dependency, next) =>
     {
@@ -159,6 +168,35 @@ services.ConfigurePipelineFor<Param>()
 
         // after
     });
+    /* other middlewares */
+```
+### Conditional middleware execution
+
+CondMiddleware is only executed if its predicate returns true.
+In this example, if `ShouldExecute()` returns true, otherwise the CondMiddleware is skipped and implicitly performs next() to continue the pipeline.
+
+```csharp
+
+services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
+    .UseWhen<Param, CondMiddleware>(p => p.ShouldExecute());
+    /* other middlewares */
+ ```
+
+Same as above, but here lambda as conditional middleware
+
+ ```csharp
+services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
+    .UseWhen(p => p.ShouldExecute(), async (sp, ctx, next) =>
+    {
+        // before
+
+        await next();
+
+        // after
+    });
+    /* other middlewares */
 ```
 
 ### Contribute
