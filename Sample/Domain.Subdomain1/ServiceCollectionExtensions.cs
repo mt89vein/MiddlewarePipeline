@@ -14,14 +14,14 @@ namespace Domain.Subdomain1
         {
             return pipelineBuilder.Use((sp, next) =>
             {
-                return async ctx =>
+                return async (ctx, cancellationToken) =>
                 {
                     if (ctx.Response.Type == SubDomainType.Subdomain1)
                     {
-                        await BuildPipeline(sp).ExecuteAsync(ctx);
+                        await BuildPipeline(sp).ExecuteAsync(ctx, cancellationToken);
                     }
 
-                    await next(ctx);
+                    await next(ctx, cancellationToken);
                 };
             });
         }

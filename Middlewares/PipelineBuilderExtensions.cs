@@ -26,9 +26,9 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((_, next) => context =>
+            return builder.Use((_, next) => (context, cancellationToken) =>
             {
-                return middleware(context, () => next(context));
+                return middleware(context, () => next(context, cancellationToken));
             });
         }
 
@@ -48,9 +48,9 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((_, next) => context =>
+            return builder.Use((_, next) => (context, cancellationToke) =>
             {
-                return middleware(c => next(c))(context);
+                return middleware((c, _) => next(c))(context, cancellationToke);
             });
         }
     }

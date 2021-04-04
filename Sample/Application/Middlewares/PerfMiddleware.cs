@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Middlewares;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Middlewares
@@ -21,7 +22,8 @@ namespace Application.Middlewares
         /// </summary>
         /// <param name="parameter">Pipeline parameter.</param>
         /// <param name="next">Next middleware.</param>
-        public async Task InvokeAsync(SomeContext parameter, NextMiddleware next)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task InvokeAsync(SomeContext parameter, NextMiddleware next, CancellationToken cancellationToken)
         {
             var sw = new Stopwatch();
             sw.Start();

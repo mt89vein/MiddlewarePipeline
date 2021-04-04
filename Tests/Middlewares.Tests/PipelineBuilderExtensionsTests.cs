@@ -91,11 +91,11 @@ namespace Middlewares.Tests
                 .ConfigurePipelineFor<TestCtx>()
                 .Use(next =>
                 {
-                    return ctx =>
+                    return (ctx, cancellationToken) =>
                     {
                         ctx.Msg = "123";
 
-                        return next(ctx);
+                        return next(ctx, cancellationToken);
                     };
                 });
 

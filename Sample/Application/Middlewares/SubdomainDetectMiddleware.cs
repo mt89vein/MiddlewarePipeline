@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
-using Domain.Enums;
+﻿using Domain.Enums;
 using Domain.Models;
 using Microsoft.Extensions.Logging;
 using Middlewares;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Middlewares
 {
@@ -15,7 +16,7 @@ namespace Application.Middlewares
             _logger = logger;
         }
 
-        public async Task InvokeAsync(SomeContext parameter, NextMiddleware next)
+        public async Task InvokeAsync(SomeContext parameter, NextMiddleware next, CancellationToken cancellationToken)
         {
             _logger.LogInformation("before SubdomainDetectMiddleware next");
 

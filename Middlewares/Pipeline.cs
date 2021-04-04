@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares
@@ -8,7 +9,7 @@ namespace Middlewares
     /// <summary>
     /// Pipeline for <typeparamref name="TParameter"/>.
     /// </summary>
-    /// <typeparam name="TParameter">Pipeline parametr type.</typeparam>
+    /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
     public class Pipeline<TParameter> : IPipeline<TParameter>
         where TParameter : class
     {
@@ -23,7 +24,12 @@ namespace Middlewares
         private readonly IList<PipelineComponents<TParameter>> _pipelineComponents;
 
         /// <summary>
-        /// Initiates new instance of <see cref="Pipeline{TParameter}"/>.
+        /// Completed middleware.
+        /// </summary>
+        private readonly NextMiddleware _completedMiddleware = () => Task.CompletedTask;
+
+        /// <summary>
+        /// Initiates new instance of <see cref="Pipeline{TParameter}"/> class.
         /// </summary>
         /// <param name="serviceProvider">Application service provider.</param>
         /// <param name="pipelineInfoAccessor">Pipeline information accessor.</param>
@@ -37,7 +43,8 @@ namespace Middlewares
         /// Execute configured pipeline.
         /// </summary>
         /// <param name="parameter">Pipeline parameter.</param>
-        public Task ExecuteAsync(TParameter parameter)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Task ExecuteAsync(TParameter parameter, CancellationToken cancellationToken = default)
         {
             if (_pipelineComponents.Count == 0)
             {
@@ -45,34 +52,34 @@ namespace Middlewares
             }
 
             var index = 0;
-            NextMiddleware action = null!;
+            NextMiddleware next = _completedMiddleware;
 
-            action = () =>
+            next = () =>
             {
                 var type = _pipelineComponents[index];
 
                 index++;
                 if (index == _pipelineComponents.Count)
                 {
-                    action = () => Task.CompletedTask; // final action
+                    next = _completedMiddleware; // final action
                 }
 
                 if (type.NextMiddlewareType is not null)
                 {
                     var typedMiddleware = (IMiddleware<TParameter>)ActivatorUtilities.CreateInstance(_serviceProvider, type.NextMiddlewareType);
 
-                    return typedMiddleware.InvokeAsync(parameter, action);
+                    return typedMiddleware.InvokeAsync(parameter, next, cancellationToken);
                 }
 
                 if (type.NextFunc is not null)
                 {
-                    return type.NextFunc(_serviceProvider, _ => action())(parameter);
+                    return type.NextFunc(_serviceProvider, (_, _) => next())(parameter, cancellationToken);
                 }
 
-                throw new InvalidOperationException("Invalid pipeline component. No middlware or delegate supplied.");
+                throw new InvalidOperationException("Invalid pipeline component. No middleware or delegate supplied.");
             };
 
-            return action();
+            return next();
         }
     }
 }

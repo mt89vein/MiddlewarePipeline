@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middlewares;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -12,7 +13,7 @@ namespace Api.Controllers
     public class TestController : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> Get([FromServices] IPipeline<SomeContext> pipeline)
+        public async Task<IActionResult> Get([FromServices] IPipeline<SomeContext> pipeline, CancellationToken cancellationToken)
         {
             var ctx = new SomeContext(new SomeRequest
             {
@@ -26,7 +27,7 @@ namespace Api.Controllers
                 }
             });
 
-            await pipeline.ExecuteAsync(ctx);
+            await pipeline.ExecuteAsync(ctx, cancellationToken);
 
             return Ok(ctx);
         }

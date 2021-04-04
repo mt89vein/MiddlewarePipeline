@@ -22,16 +22,16 @@ namespace Middlewares
             where TParameter : class
             where TMiddleware : IMiddleware<TParameter>
         {
-            return builder.Use((sp, next) => context =>
+            return builder.Use((sp, next) => (context, cancellationToken) =>
             {
                 if (predicate(context))
                 {
                     var middleware = (IMiddleware<TParameter>)ActivatorUtilities.CreateInstance<TMiddleware>(sp);
 
-                    return middleware.InvokeAsync(context, () => next(context));
+                    return middleware.InvokeAsync(context, () => next(context, cancellationToken), cancellationToken);
                 }
 
-                return next(context);
+                return next(context, cancellationToken);
             });
         }
 
@@ -54,14 +54,14 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((sp, next) => context =>
+            return builder.Use((sp, next) => (context, cancellationToken) =>
             {
                 if (predicate(context))
                 {
-                    return middleware(sp, context, () => next(context));
+                    return middleware(sp, context, () => next(context, cancellationToken));
                 }
 
-                return next(context);
+                return next(context, cancellationToken);
             });
         }
     }

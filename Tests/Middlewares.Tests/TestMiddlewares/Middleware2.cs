@@ -1,10 +1,11 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests.TestMiddlewares
 {
     public class Middleware2 : IMiddleware<TestCtx>
     {
-        public async Task InvokeAsync(TestCtx parameter, NextMiddleware next)
+        public async Task InvokeAsync(TestCtx parameter, NextMiddleware next, CancellationToken cancellationToken)
         {
             parameter.ExecutedMiddlewaresCount++;
 

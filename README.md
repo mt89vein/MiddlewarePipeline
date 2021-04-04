@@ -82,7 +82,7 @@ services.ConfigurePipelineFor<Param>()
 
 public class FirstMiddleware : IMiddleware<Param>
 {
-    public async Task InvokeAsync(Param param, NextMiddleware next)
+    public async Task InvokeAsync(Param param, NextMiddleware next, CancellationToken cancellationToken)
     {
         // do something useful (before next middlewares)
 
@@ -139,13 +139,13 @@ services.ConfigurePipelineFor<Param>()
     {
         var dep = sp.GetRequiredService<Dependency>();
 
-        return async param =>
+        return async (param, cancellationToken) =>
         {
             // before
 
-            await dep.DoSomethingAsync(param);
+            await dep.DoSomethingAsync(param, cancellationToken);
 
-            await next(param);
+            await next(param, cancellationToken);
 
             // after
         };

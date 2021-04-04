@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Domain.Subdomain1.Models;
 using Middlewares;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Domain.Subdomain1.Middlewares
@@ -12,7 +13,7 @@ namespace Domain.Subdomain1.Middlewares
         /// </summary>
         /// <param name="parameter">Pipeline parameter.</param>
         /// <param name="next">Next middleware.</param>
-        public Task InvokeAsync(SomeContext parameter, NextMiddleware next)
+        public Task InvokeAsync(SomeContext parameter, NextMiddleware next, CancellationToken cancellationToken)
         {
             foreach (var doc in parameter.Request.Documents)
             {

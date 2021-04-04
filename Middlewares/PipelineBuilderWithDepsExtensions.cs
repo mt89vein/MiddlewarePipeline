@@ -28,11 +28,11 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((sp, next) => context =>
+            return builder.Use((sp, next) => (context, cancellationToken) =>
             {
                 var dep1 = sp.GetRequiredService<TDep1>();
 
-                return middleware(context, dep1, () => next(context));
+                return middleware(context, dep1, () => next(context, cancellationToken));
             });
         }
 
@@ -56,12 +56,12 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((sp, next) => context =>
+            return builder.Use((sp, next) => (context, cancellationToken) =>
             {
                 var dep1 = sp.GetRequiredService<TDep1>();
                 var dep2 = sp.GetRequiredService<TDep2>();
 
-                return middleware(context, dep1, dep2, () => next(context));
+                return middleware(context, dep1, dep2, () => next(context, cancellationToken));
             });
         }
 
@@ -86,13 +86,13 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((sp, next) => context =>
+            return builder.Use((sp, next) => (context, cancellationToken) =>
             {
                 var dep1 = sp.GetRequiredService<TDep1>();
                 var dep2 = sp.GetRequiredService<TDep2>();
                 var dep3 = sp.GetRequiredService<TDep3>();
 
-                return middleware(context, dep1, dep2, dep3, () => next(context));
+                return middleware(context, dep1, dep2, dep3, () => next(context, cancellationToken));
             });
         }
     }
