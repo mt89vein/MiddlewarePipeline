@@ -14,12 +14,12 @@ namespace Middlewares
         /// <summary>
         /// Pipeline components.
         /// </summary>
-        private readonly List<PipelineComponents<TParameter>> _pipelineComponents = new();
+        private readonly List<PipelineComponent<TParameter>> _pipelineComponents = new();
 
         /// <summary>
         /// Pipeline components.
         /// </summary>
-        public IEnumerable<PipelineComponents<TParameter>> PipelineComponents => _pipelineComponents;
+        public IEnumerable<PipelineComponent<TParameter>> PipelineComponents => _pipelineComponents;
 
         /// <summary>
         /// Adds a middleware type to be executed in pipeline.
@@ -55,7 +55,7 @@ namespace Middlewares
                 );
             }
 
-            _pipelineComponents.Add(new PipelineComponents<TParameter>(middlewareType));
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middlewareType));
 
             return this;
         }
@@ -73,9 +73,19 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            _pipelineComponents.Add(new PipelineComponents<TParameter>(middleware));
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middleware));
 
             return this;
+        }
+
+        /// <summary>
+        /// Creates <see cref="IPipeline{TParameter}"/> from current pipeline components.
+        /// </summary>
+        /// <param name="serviceProvider">Application service provider.</param>
+        /// <returns>Pipeline.</returns>
+        public IPipeline<TParameter> Build(IServiceProvider serviceProvider)
+        {
+            return new Pipeline<TParameter>(serviceProvider, this);
         }
     }
 }

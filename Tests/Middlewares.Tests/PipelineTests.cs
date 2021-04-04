@@ -32,7 +32,7 @@ namespace Middlewares.Tests
                 ctx.Msg += "After_LambdaMiddleware";
             });
 
-            var pipeline = new Pipeline<TestCtx>(new ServiceCollection().BuildServiceProvider(), pipelineBuilder);
+            var pipeline = pipelineBuilder.Build(new ServiceCollection().BuildServiceProvider());
 
             var testContext = new TestCtx();
             Assert.IsNull(testContext.Msg);
@@ -78,7 +78,7 @@ namespace Middlewares.Tests
                 ctx.Msg += "After_LambdaMiddleware";
             });
 
-            var pipeline = new Pipeline<TestCtx>(sp, pipelineBuilder);
+            var pipeline = pipelineBuilder.Build(sp);
 
             var testContext = new TestCtx();
 
@@ -97,7 +97,7 @@ namespace Middlewares.Tests
             // arrange
             var pipelineInfoAccessorMock = new Mock<IPipelineInfoAccessor<TestCtx>>();
             pipelineInfoAccessorMock.Setup(d => d.PipelineComponents)
-                .Returns(new List<PipelineComponents<TestCtx>>
+                .Returns(new List<PipelineComponent<TestCtx>>
                 {
                     new() // invalid instance
                 });
@@ -114,13 +114,13 @@ namespace Middlewares.Tests
         [Test]
         public void Should_ThrowArgNull_If_Invalid_ComponentArgType()
         {
-            Assert.Throws<ArgumentNullException>(() => new PipelineComponents<TestCtx>(nextMiddlewareType: null!));
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextMiddlewareType: null!));
         }
 
         [Test]
         public void Should_ThrowArgNull_If_Invalid_ComponentArgFunc()
         {
-            Assert.Throws<ArgumentNullException>(() => new PipelineComponents<TestCtx>(nextFunc: null!));
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextFunc: null!));
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Domain.Subdomain1.Middlewares
         /// </summary>
         /// <param name="parameter">Pipeline parameter.</param>
         /// <param name="next">Next middleware.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public Task InvokeAsync(SomeContext parameter, NextMiddleware next, CancellationToken cancellationToken)
         {
             foreach (var doc in parameter.Request.Documents)

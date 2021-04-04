@@ -21,7 +21,7 @@ namespace Middlewares
         /// <summary>
         /// Pipeline components.
         /// </summary>
-        private readonly IList<PipelineComponents<TParameter>> _pipelineComponents;
+        private readonly IList<PipelineComponent<TParameter>> _pipelineComponents;
 
         /// <summary>
         /// Completed middleware.
@@ -36,7 +36,7 @@ namespace Middlewares
         public Pipeline(IServiceProvider serviceProvider, IPipelineInfoAccessor<TParameter> pipelineInfoAccessor)
         {
             _serviceProvider = serviceProvider;
-            _pipelineComponents = new List<PipelineComponents<TParameter>>(pipelineInfoAccessor.PipelineComponents);
+            _pipelineComponents = new List<PipelineComponent<TParameter>>(pipelineInfoAccessor.PipelineComponents);
         }
 
         /// <summary>

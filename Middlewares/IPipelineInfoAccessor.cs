@@ -12,6 +12,6 @@ namespace Middlewares
         /// <summary>
         /// Pipeline components.
         /// </summary>
-        IEnumerable<PipelineComponents<TParameter>> PipelineComponents { get; }
+        IEnumerable<PipelineComponent<TParameter>> PipelineComponents { get; }
     }
 }

@@ -34,7 +34,7 @@ namespace Domain.Subdomain1
 
             // chain other subdomain 1 middlewares
 
-            return new Pipeline<SomeContext>(sp, pipeline);
+            return pipeline.Build(sp);
         }
     }
 }

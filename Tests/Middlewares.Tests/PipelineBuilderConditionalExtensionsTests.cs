@@ -27,7 +27,7 @@ namespace Middlewares.Tests
                 ctx.Msg += "After_LambdaMiddleware";
             });
 
-            var pipeline = new Pipeline<TestCtx>(new ServiceCollection().BuildServiceProvider(), pipelineBuilder);
+            var pipeline = pipelineBuilder.Build(new ServiceCollection().BuildServiceProvider());
 
             var testContext = new TestCtx
             {
@@ -73,7 +73,7 @@ namespace Middlewares.Tests
             });
             pipelineBuilder.Use<Middleware2>();
 
-            var pipeline = new Pipeline<TestCtx>(new ServiceCollection().BuildServiceProvider(), pipelineBuilder);
+            var pipeline = pipelineBuilder.Build(new ServiceCollection().BuildServiceProvider());
 
             var testContext = new TestCtx
             {
@@ -102,20 +102,38 @@ namespace Middlewares.Tests
         }
 
         [Test]
-        public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate()
+        public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate(
+            [Values(true, false)]bool predicateResult,
+            [Values(true, false)]bool passNull
+        )
         {
             // arrange
             var services = new ServiceCollection();
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<IServiceProvider, TestCtx, Func<Task>, Task> middleware = null;
+            Func<IServiceProvider, TestCtx, Func<Task>, Task> middleware = passNull
+                ? null
+                : (_, _, _) => Task.CompletedTask;
 
             // act
-            void TestCode() => pipelineBuilder.UseWhen(_ => true, middleware!);
+            void TestCode() => pipelineBuilder.UseWhen(_ => predicateResult, middleware!);
 
             // assert
-            Assert.Throws<ArgumentNullException>(TestCode);
+            if (passNull)
+            {
+                Assert.Throws<ArgumentNullException>(TestCode);
+            }
+            else
+            {
+                Assert.DoesNotThrow(TestCode);
+
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    var sp = services.BuildServiceProvider();
+                    await sp.GetRequiredService<IPipeline<TestCtx>>().ExecuteAsync(new TestCtx());
+                });
+            }
         }
     }
 }
