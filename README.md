@@ -3,7 +3,7 @@ MiddlewarePipeline
 
 Set of classes and interfaces for configuring and executing custom pipeline using middleware pattern.
 
-If you familiar with ASP.NET Core HttpContext pipeline and middlewares, then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
+If you familiar with [ASP.NET Core HttpContext pipeline and middlewares](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/?view=aspnetcore-5.0), then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
 
 [![NuGet version (MiddlewarePipeline)](https://img.shields.io/nuget/v/MiddlewarePipeline.svg?style=flat-square)](https://www.nuget.org/packages/MiddlewarePipeline)
 ![UnitTest](https://github.com/mt89vein/MiddlewarePipeline/workflows/UnitTest/badge.svg)
@@ -110,7 +110,7 @@ public class ExampleController : ControllerBase
 
 If you need pipeline branching, you can extend it with building your own pipeline using PipelineBuilder class, create Pipeline class from it, and execute.
 
-look at [ServiceCollectionExtensions.cs](https://github.com/mt89vein/MiddlewarePipeline/blob/master/Sample/Application/ServiceCollectionExtensions.cs) for more advanced examples
+look at [Manually build pipeline section](#manually-build-pipeline) or [ServiceCollectionExtensions.cs](https://github.com/mt89vein/MiddlewarePipeline/blob/master/Sample/Application/ServiceCollectionExtensions.cs) for more advanced examples
 
 ## Features
 
