@@ -15,15 +15,15 @@ Look at tests for additional examples.
 
 You should install [MiddlewarePipeline with NuGet](https://www.nuget.org/packages/MiddlewarePipeline):
 
-    Install-Package MiddlewarePipeline -Version 1.0.0
+    Install-Package MiddlewarePipeline -Version 1.1.0
 
 via the .NET Core command line interface:
 
-    dotnet add package MiddlewarePipeline --version 1.0.0
+    dotnet add package MiddlewarePipeline --version 1.1.0
 
 or package reference
 
-    <PackageReference Include="MiddlewarePipeline" Version="1.0.0" />
+    <PackageReference Include="MiddlewarePipeline" Version="1.1.0" />
 
 ## Use cases
 
