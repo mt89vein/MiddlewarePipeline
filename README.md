@@ -1,15 +1,15 @@
 MiddlewarePipeline
 =============
 
-Set of classes and interfaces for configuring and executing custom pipeline using middleware pattern.
-
-If you familiar with [ASP.NET Core HttpContext pipeline and middlewares](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/?view=aspnetcore-5.0), then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
-
 [![NuGet version (MiddlewarePipeline)](https://img.shields.io/nuget/v/MiddlewarePipeline.svg?style=flat-square)](https://www.nuget.org/packages/MiddlewarePipeline)
 ![UnitTest](https://github.com/mt89vein/MiddlewarePipeline/workflows/UnitTest/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/mt89vein/MiddlewarePipeline/badge.svg?branch=master&v=1)](https://coveralls.io/github/mt89vein/MiddlewarePipeline?branch=master)
 
-Look at tests for additional examples.
+Set of classes and interfaces for configuring and executing custom pipeline using middleware pattern.
+
+If you familiar with [ASP.NET Core HttpContext pipeline and middlewares](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/?view=aspnetcore-5.0), then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
+
+Look at unit tests for additional usage examples.
 
 ### Installing MiddlewarePipeline
 
@@ -42,6 +42,8 @@ public interface IDomain
 
     // and some more methods
 }
+
+public class Param {}
 ```
 
 and have some separated subdomains, that should implement this interface
@@ -80,6 +82,7 @@ services.ConfigurePipelineFor<Param>()
 // 9. After next() delegate in SubdomainDetectMiddleware
 // 10. After next() delegate in CommonMiddleware
 
+// middleware must implement IMiddleware<T> interface. Dependency injection via constructor is also supported.
 public class FirstMiddleware : IMiddleware<Param>
 {
     public async Task InvokeAsync(Param param, NextMiddleware next, CancellationToken cancellationToken)
@@ -221,11 +224,11 @@ public static IPipelineBuilder<Param> UseFirstSubdomainPipeline(
             // like conditional middleware, execute additional pipeline branch
             if (param.Type == SubDomainType.First)
             {
-                await BuildPipeline(sp).ExecuteAsync(ctx, cancellationToken);
+                await BuildPipeline(sp).ExecuteAsync(param, cancellationToken);
             }
 
             // then execute other parts
-            await next(ctx, cancellationToken);
+            await next(param, cancellationToken);
         };
     });
 }
