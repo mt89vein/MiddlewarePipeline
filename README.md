@@ -206,20 +206,58 @@ you can use this snippet:
 
 ```csharp
 /// <summary>
+/// Register first subdomain pipeline middlewares.
+/// </summary>
+/// <param name="pipelineBuilder">Pipeline builder.</param>
+/// <returns>A reference to the builder after the operation has completed.</returns>
+public static IPipelineBuilder<Param> UseFirstSubdomainPipeline(
+    this IPipelineBuilder<Param> pipelineBuilder
+)
+{
+    return pipelineBuilder.Use((sp, next) =>
+    {
+        return async (param, cancellationToken) =>
+        {
+            // like conditional middleware, execute additional pipeline branch
+            if (param.Type == SubDomainType.First)
+            {
+                await BuildPipeline(sp).ExecuteAsync(ctx, cancellationToken);
+            }
+
+            // then execute other parts
+            await next(ctx, cancellationToken);
+        };
+    });
+}
+
+/// <summary>
 /// Creates pipeline from current components.
 /// </summary>
 /// <param name="sp">Application service provider.</param>
+/// <returns>Configured pipeline.</returns>
 private static IPipeline<Param> BuildPipeline(IServiceProvider sp)
 {
-    var pipeline = new PipelineBuilder<Param>();
+    var pipelineBuilder = new PipelineBuilder<Param>();
 
-    pipeline
+    pipelineBuilder
         .Use<Middleware1>()
         .Use<Middleware2>();
         /* chain other middlewares */
 
-    return pipeline.Build(sp);
+    return pipelineBuilder.Build(sp);
 }
+```
+and register in common pipeline:
+
+```diff 
+services.ConfigurePipelineFor<Param>()
+    /* other middlewares */
+    .Use<PerfMiddleware>()
+    .Use<PreconditionCheckMiddleware>()
+    .Use<SubdomainDetectMiddleware>()
++   .UseFirstSubdomainPipeline()
+    .UseSecondSubdomainPipeline();
+    /* other middlewares */;
 ```
 
 ### Contribute
