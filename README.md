@@ -38,7 +38,7 @@ public interface IDomain
 {
     void DoOneThing(Param param);
 
-    void DoSometingElse(Param param);
+    void DoSomethingElse(Param param);
 
     // and some more methods
 }
