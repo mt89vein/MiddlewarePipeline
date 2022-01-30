@@ -17,7 +17,7 @@ namespace Middlewares.Tests
 
             pipelineBuilder.Use<Middleware1>();
             pipelineBuilder.UseWhen<TestCtx, Middleware2>(ctx => ctx.ExecuteMiddleware2);
-            pipelineBuilder.Use(async (ctx, next) =>
+            pipelineBuilder.Use(async (ctx, next, _) =>
             {
                 ctx.ExecutedMiddlewaresCount++;
 

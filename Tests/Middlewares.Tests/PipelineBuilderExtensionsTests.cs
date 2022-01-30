@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests
@@ -34,7 +35,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<TestCtx, Func<Task>, Task> middleware = null;
+            Func<TestCtx, NextMiddleware, CancellationToken, Task> middleware = null;
 
             // act
             void TestCode() => pipelineBuilder.Use(middleware!);

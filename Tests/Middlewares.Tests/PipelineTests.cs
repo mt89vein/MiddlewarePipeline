@@ -22,7 +22,7 @@ namespace Middlewares.Tests
 
             pipelineBuilder.Use<Middleware1>();
             pipelineBuilder.Use<Middleware2>();
-            pipelineBuilder.Use(async (ctx, next) =>
+            pipelineBuilder.Use(async (ctx, next, ct) =>
             {
                 ctx.ExecutedMiddlewaresCount++;
 
@@ -97,18 +97,16 @@ namespace Middlewares.Tests
             // arrange
             var pipelineInfoAccessorMock = new Mock<IPipelineInfoAccessor<TestCtx>>();
             pipelineInfoAccessorMock.Setup(d => d.PipelineComponents)
-                .Returns(new List<PipelineComponent<TestCtx>>
+                .Returns(new[]
                 {
-                    new() // invalid instance
+                    new PipelineComponent<TestCtx>() // invalid instance
                 });
 
-            var pipeline = new Pipeline<TestCtx>(null!, pipelineInfoAccessorMock.Object);
-
             // act
-            Task TestCode() => pipeline.ExecuteAsync(new TestCtx());
+            void TestCode() => new Pipeline<TestCtx>(null!, pipelineInfoAccessorMock.Object);
 
             // assert
-            Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+            Assert.Throws<ArgumentException>(TestCode);
         }
 
         [Test]

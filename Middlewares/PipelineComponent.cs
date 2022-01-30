@@ -29,13 +29,16 @@ namespace Middlewares
     /// <param name="serviceProvider">DI Service provider.</param>
     /// <param name="nextMiddleware">Middleware function.</param>
     /// <returns>Middleware func.</returns>
-    public delegate MiddlewareDelegate<TParameter> FuncAsNextMiddlewareDelegate<TParameter>(IServiceProvider serviceProvider, MiddlewareDelegate<TParameter> nextMiddleware);
+    public delegate MiddlewareDelegate<TParameter> FuncAsNextMiddlewareDelegate<TParameter>(
+        IServiceProvider serviceProvider,
+        MiddlewareDelegate<TParameter> nextMiddleware
+    );
 
     /// <summary>
     /// Pipeline component.
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    public class PipelineComponent<TParameter>
+    internal sealed class PipelineComponent<TParameter>
         where TParameter : class
     {
         /// <summary>
@@ -111,6 +114,26 @@ namespace Middlewares
         public PipelineComponent(FuncAsNextMiddlewareDelegate<TParameter> nextFunc)
         {
             NextFunc = nextFunc ?? throw new ArgumentNullException(nameof(nextFunc));
+        }
+
+        /// <summary>
+        /// Returns true, only if service provider is not required for this pipeline.
+        /// </summary>
+        internal bool CanExecuteWithoutServiceProvider()
+        {
+            return NextMiddleware is not null;
+        }
+        
+        /// <summary>
+        /// Returns true, only if component have correct executable middleware.
+        /// </summary>
+        internal bool IsValidComponent()
+        {
+            return NextMiddleware is not null ||
+                   NextMiddlewareType is not null ||
+                   NextMiddlewareFactory is not null ||
+                   NextMiddlewareWithProviderFactory is not null ||
+                   NextFunc is not null;
         }
     }
 }

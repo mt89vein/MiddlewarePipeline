@@ -8,6 +8,8 @@ namespace Domain.Subdomain1
 {
     public static class ServiceCollectionExtensions
     {
+        private static IPipeline<SomeContext> _subdomain1Pipeline;
+
         public static IPipelineBuilder<SomeContext> UseSubdomain1Pipeline(
             this IPipelineBuilder<SomeContext> pipelineBuilder
         )
@@ -32,13 +34,18 @@ namespace Domain.Subdomain1
         /// <param name="sp">Application service provider.</param>
         private static IPipeline<SomeContext> BuildPipeline(IServiceProvider sp)
         {
+            if (_subdomain1Pipeline is not null)
+            {
+                return _subdomain1Pipeline;
+            }
+
             var pipeline = new PipelineBuilder<SomeContext>();
 
             pipeline.Use<Subdomain1Middleware>();
 
             // chain other subdomain 1 middlewares
 
-            return pipeline.Build(sp);
+            return _subdomain1Pipeline = pipeline.Build(sp);
         }
     }
 }

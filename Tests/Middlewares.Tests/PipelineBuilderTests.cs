@@ -40,7 +40,7 @@ namespace Middlewares.Tests
 
             var firstPipeline = pipelineBuilder.Build(sp);
 
-            pipelineBuilder.Use(async (ctx, next) =>
+            pipelineBuilder.Use(async (ctx, next, ct) =>
             {
                 ctx.Msg += "Before_LambdaMiddleware";
 

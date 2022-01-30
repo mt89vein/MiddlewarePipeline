@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares
@@ -17,7 +18,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> Use<TParameter>(
             this IPipelineBuilder<TParameter> builder,
-            Func<TParameter, Func<Task>, Task> middleware
+            Func<TParameter, NextMiddleware, CancellationToken, Task> middleware
         )
             where TParameter : class
         {
@@ -28,7 +29,7 @@ namespace Middlewares
 
             return builder.Use((_, next) => (context, cancellationToken) =>
             {
-                return middleware(context, () => next(context, cancellationToken));
+                return middleware(context, () => next(context, cancellationToken), cancellationToken);
             });
         }
 
@@ -41,7 +42,8 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> Use<TParameter>(
             this IPipelineBuilder<TParameter> builder,
-            Func<MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware)
+            Func<MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware
+        )
         {
             if (middleware is null)
             {

@@ -10,15 +10,24 @@ namespace Application
     {
         public static void AddPipeline(this IServiceCollection services)
         {
+            var builder = new PipelineBuilder<SomeContext>();
+            builder.Use(new SubdomainDetectMiddleware(null));
+            builder.Use(ctx => new SubdomainDetectMiddleware(null));
+
+            builder.Build();
+
             services.ConfigurePipelineFor<SomeContext>()
-                .Use<PerfMiddleware>()
+                .Use<UnhandledExceptionMiddleware<SomeContext>>()
+                .Use<PerfMiddleware<SomeContext>>()
                 .Use<PreconditionCheckMiddleware>()
                 .Use<SubdomainDetectMiddleware>()
+                .Use(_ => new SubdomainDetectMiddleware(null))
+                .Use(new SubdomainDetectMiddleware(null))
                 .UseSubdomain1Pipeline()
                 // .UseSubdomain2Pipeline()
-                .Use(async (_, next) =>
+                .Use(async (_, next, ct) =>
                 {
-                    // this is last -> finalyzer
+                    // this is last -> finalizer
 
                     // before
 

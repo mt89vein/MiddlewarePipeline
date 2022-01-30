@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Middlewares
@@ -20,7 +19,7 @@ namespace Middlewares
         /// <summary>
         /// Pipeline components.
         /// </summary>
-        public IEnumerable<PipelineComponent<TParameter>> PipelineComponents => _pipelineComponents;
+        IEnumerable<PipelineComponent<TParameter>> IPipelineInfoAccessor<TParameter>.PipelineComponents => _pipelineComponents;
 
         /// <summary>
         /// Adds a middleware type to be executed in pipeline.
@@ -138,24 +137,9 @@ namespace Middlewares
         /// </summary>
         /// <param name="serviceProvider">Application service provider.</param>
         /// <returns>Pipeline.</returns>
-        public IPipeline<TParameter> Build(IServiceProvider serviceProvider)
+        public IPipeline<TParameter> Build(IServiceProvider? serviceProvider = null)
         {
-            return new Pipeline<TParameter>(serviceProvider, this);
-        }
-
-        /// <summary>
-        /// Creates <see cref="IPipeline{TParameter}"/> from current pipeline components.
-        /// </summary>
-        /// <returns>Pipeline.</returns>
-        public IPipeline<TParameter> Build()
-        {
-            if (_pipelineComponents.Any(x => x.NextMiddlewareWithProviderFactory is not null || x.NextFunc is not null || x.NextMiddlewareType is not null))
-            {
-                throw new InvalidOperationException(
-                    "When using non DI builder, you should provide middleware pipeline instances by yourself or with from factory without service provider.");
-            }
-
-            return new Pipeline<TParameter>(null!, this);
+            return new Pipeline<TParameter>(serviceProvider, _pipelineComponents);
         }
     }
 }

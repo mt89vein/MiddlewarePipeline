@@ -6,7 +6,7 @@ namespace Middlewares
     /// Pipeline information accessor.
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    public interface IPipelineInfoAccessor<TParameter>
+    internal interface IPipelineInfoAccessor<TParameter>
         where TParameter : class
     {
         /// <summary>

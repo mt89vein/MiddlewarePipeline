@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,10 +34,33 @@ namespace Middlewares
         /// </summary>
         /// <param name="serviceProvider">Application service provider.</param>
         /// <param name="pipelineInfoAccessor">Pipeline information accessor.</param>
-        public Pipeline(IServiceProvider serviceProvider, IPipelineInfoAccessor<TParameter> pipelineInfoAccessor)
+        /// <exception cref="ArgumentNullException">If ServiceProvider required.</exception>
+        public Pipeline(IServiceProvider? serviceProvider, IPipelineInfoAccessor<TParameter> pipelineInfoAccessor)
+            : this(serviceProvider, new List<PipelineComponent<TParameter>>(pipelineInfoAccessor.PipelineComponents))
         {
-            _serviceProvider = serviceProvider;
-            _pipelineComponents = new List<PipelineComponent<TParameter>>(pipelineInfoAccessor.PipelineComponents);
+        }
+
+        /// <summary>
+        /// Initiates new instance of <see cref="Pipeline{TParameter}"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">Application service provider.</param>
+        /// <param name="pipelineComponents">Pipeline components (middlewares).</param>
+        /// <exception cref="ArgumentNullException">If ServiceProvider required.</exception>
+        internal Pipeline(IServiceProvider? serviceProvider, IEnumerable<PipelineComponent<TParameter>> pipelineComponents)
+        {
+            _pipelineComponents = new List<PipelineComponent<TParameter>>(pipelineComponents);
+            _serviceProvider = serviceProvider!;
+
+            if (!_pipelineComponents.All(x => x.IsValidComponent()))
+            {
+                throw new ArgumentException("Invalid pipeline component detected. No middleware or delegate supplied.");
+            }
+
+            if (serviceProvider is null && !_pipelineComponents.All(x => x.CanExecuteWithoutServiceProvider()))
+            {
+                throw new ArgumentNullException(nameof(serviceProvider),
+                    "When using non DI builder, you should provide middleware pipeline instances by yourself or from factory without service provider.");
+            }
         }
 
         /// <summary>
@@ -84,6 +108,11 @@ namespace Middlewares
                 if (type.NextMiddlewareWithProviderFactory is not null)
                 {
                     return type.NextMiddlewareWithProviderFactory(_serviceProvider, parameter).InvokeAsync(parameter, next, cancellationToken);
+                }
+
+                if (type.NextMiddleware is not null)
+                {
+                    return type.NextMiddleware.InvokeAsync(parameter, next, cancellationToken);
                 }
 
                 throw new InvalidOperationException("Invalid pipeline component. No middleware or delegate supplied.");

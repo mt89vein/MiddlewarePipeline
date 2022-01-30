@@ -26,7 +26,7 @@ namespace Middlewares
             {
                 if (predicate(context))
                 {
-                    var middleware = (IMiddleware<TParameter>)ActivatorUtilities.CreateInstance<TMiddleware>(sp);
+                    var middleware = (IMiddleware<TParameter>)ActivatorUtilities.GetServiceOrCreateInstance<TMiddleware>(sp);
 
                     return middleware.InvokeAsync(context, () => next(context, cancellationToken), cancellationToken);
                 }
