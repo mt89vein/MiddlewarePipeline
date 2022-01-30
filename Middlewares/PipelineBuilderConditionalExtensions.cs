@@ -49,7 +49,7 @@ namespace Middlewares
         )
             where TParameter : class
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }

@@ -23,7 +23,7 @@ namespace Middlewares
             where TParameter : class
             where TDep1 : notnull
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }
@@ -51,7 +51,7 @@ namespace Middlewares
             where TDep1 : notnull
             where TDep2 : notnull
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }
@@ -81,7 +81,7 @@ namespace Middlewares
             where TDep2 : notnull
             where TDep3 : notnull
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }

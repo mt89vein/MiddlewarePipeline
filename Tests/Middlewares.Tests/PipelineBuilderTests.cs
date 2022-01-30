@@ -17,17 +17,15 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<IServiceProvider, MiddlewareDelegate<TestCtx>, MiddlewareDelegate<TestCtx>> middleware = null;
-
             // act
-            void TestCode() => pipelineBuilder.Use(middleware!);
+            void TestCode() => pipelineBuilder.Use((FuncAsNextMiddlewareDelegate<TestCtx>)null);
 
             // assert
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
         /// <summary>
-        /// <see cref="PipelineBuilder{TParameter}.Build"/> creates <see cref="IPipeline{TParameter}"/>
+        /// <see cref="PipelineBuilder{TParameter}.Build(IServiceProvider)"/> creates <see cref="IPipeline{TParameter}"/>
         /// with current set of <see cref="PipelineComponent{TParameter}"/>, and should not affect on further PipelineBuilder changes.
         /// </summary>
         [Test]
@@ -50,7 +48,6 @@ namespace Middlewares.Tests
 
                 ctx.Msg += "After_LambdaMiddleware";
             });
-
             var secondPipeline = pipelineBuilder.Build(sp);
 
             var testContext = new TestCtx();

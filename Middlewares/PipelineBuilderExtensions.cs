@@ -21,7 +21,7 @@ namespace Middlewares
         )
             where TParameter : class
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }
@@ -43,14 +43,14 @@ namespace Middlewares
             this IPipelineBuilder<TParameter> builder,
             Func<MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware)
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((_, next) => (context, cancellationToke) =>
+            return builder.Use((_, next) => (context, cancellationToken) =>
             {
-                return middleware((c, _) => next(c))(context, cancellationToke);
+                return middleware((c, _) => next(c, cancellationToken))(context, cancellationToken);
             });
         }
     }

@@ -27,11 +27,35 @@ namespace Middlewares
         IPipelineBuilder<TParameter> Use(Type middlewareType);
 
         /// <summary>
+        /// Adds a middleware instance to be executed in pipeline.
+        /// </summary>
+        /// <param name="middleware">Middleware instance.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        IPipelineBuilder<TParameter> Use(IMiddleware<TParameter> middleware);
+
+        /// <summary>
+        /// Adds a middleware from factory into pipeline.
+        /// </summary>
+        /// <param name="middlewareFactory">The middleware factory to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareFactory"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        IPipelineBuilder<TParameter> Use(ParameterAsNextMiddlewareFactoryDelegate<TParameter> middlewareFactory);
+
+        /// <summary>
+        /// Adds a middleware from factory into pipeline.
+        /// </summary>
+        /// <param name="middlewareFactory">The middleware factory to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareFactory"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        IPipelineBuilder<TParameter> Use(ParameterWithServiceProviderAsNextMiddlewareFactoryDelegate<TParameter> middlewareFactory);
+
+        /// <summary>
         /// Adds a middleware func to be executed in pipeline.
         /// </summary>
         /// <param name="middleware">The middleware as func to be executed.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
         /// <returns>A reference to the builder after the operation has completed.</returns>
-        IPipelineBuilder<TParameter> Use(Func<IServiceProvider, MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware);
+        IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middleware);
     }
 }

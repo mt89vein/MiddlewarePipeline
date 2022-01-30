@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Middlewares
@@ -42,7 +43,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public IPipelineBuilder<TParameter> Use(Type middlewareType)
         {
-            if (middlewareType == null)
+            if (middlewareType is null)
             {
                 throw new ArgumentNullException(nameof(middlewareType));
             }
@@ -61,19 +62,73 @@ namespace Middlewares
         }
 
         /// <summary>
-        /// Adds a middleware func to be executed in pipeline.
+        /// Adds a middleware instance to be executed in pipeline.
         /// </summary>
-        /// <param name="middleware">The middleware as func to be executed.</param>
+        /// <param name="middleware">Middleware instance.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
         /// <returns>A reference to the builder after the operation has completed.</returns>
-        public IPipelineBuilder<TParameter> Use(Func<IServiceProvider, MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware)
+        public IPipelineBuilder<TParameter> Use(IMiddleware<TParameter> middleware)
         {
-            if (middleware == null)
+            if (middleware is null)
             {
                 throw new ArgumentNullException(nameof(middleware));
             }
 
             _pipelineComponents.Add(new PipelineComponent<TParameter>(middleware));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a middleware func to be executed in pipeline.
+        /// </summary>
+        /// <param name="middleware">The middleware as func to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        public IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middleware)
+        {
+            if (middleware is null)
+            {
+                throw new ArgumentNullException(nameof(middleware));
+            }
+
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middleware));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a middleware from factory into pipeline.
+        /// </summary>
+        /// <param name="middlewareFactory">The middleware factory to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareFactory"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        public IPipelineBuilder<TParameter> Use(ParameterAsNextMiddlewareFactoryDelegate<TParameter> middlewareFactory)
+        {
+            if (middlewareFactory is null)
+            {
+                throw new ArgumentNullException(nameof(middlewareFactory));
+            }
+
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middlewareFactory));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a middleware from factory into pipeline.
+        /// </summary>
+        /// <param name="middlewareFactory">The middleware factory to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareFactory"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        public IPipelineBuilder<TParameter> Use(ParameterWithServiceProviderAsNextMiddlewareFactoryDelegate<TParameter> middlewareFactory)
+        {
+            if (middlewareFactory is null)
+            {
+                throw new ArgumentNullException(nameof(middlewareFactory));
+            }
+
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middlewareFactory));
 
             return this;
         }
@@ -86,6 +141,21 @@ namespace Middlewares
         public IPipeline<TParameter> Build(IServiceProvider serviceProvider)
         {
             return new Pipeline<TParameter>(serviceProvider, this);
+        }
+
+        /// <summary>
+        /// Creates <see cref="IPipeline{TParameter}"/> from current pipeline components.
+        /// </summary>
+        /// <returns>Pipeline.</returns>
+        public IPipeline<TParameter> Build()
+        {
+            if (_pipelineComponents.Any(x => x.NextMiddlewareWithProviderFactory is not null || x.NextFunc is not null || x.NextMiddlewareType is not null))
+            {
+                throw new InvalidOperationException(
+                    "When using non DI builder, you should provide middleware pipeline instances by yourself or with from factory without service provider.");
+            }
+
+            return new Pipeline<TParameter>(null!, this);
         }
     }
 }

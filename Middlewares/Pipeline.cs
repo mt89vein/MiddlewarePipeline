@@ -10,7 +10,7 @@ namespace Middlewares
     /// Pipeline for <typeparamref name="TParameter"/>.
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    public class Pipeline<TParameter> : IPipeline<TParameter>
+    internal class Pipeline<TParameter> : IPipeline<TParameter>
         where TParameter : class
     {
         /// <summary>
@@ -52,7 +52,7 @@ namespace Middlewares
             }
 
             var index = 0;
-            NextMiddleware next = _completedMiddleware;
+            var next = _completedMiddleware;
 
             next = () =>
             {
@@ -66,7 +66,7 @@ namespace Middlewares
 
                 if (type.NextMiddlewareType is not null)
                 {
-                    var typedMiddleware = (IMiddleware<TParameter>)ActivatorUtilities.CreateInstance(_serviceProvider, type.NextMiddlewareType);
+                    var typedMiddleware = (IMiddleware<TParameter>)ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, type.NextMiddlewareType);
 
                     return typedMiddleware.InvokeAsync(parameter, next, cancellationToken);
                 }
@@ -74,6 +74,16 @@ namespace Middlewares
                 if (type.NextFunc is not null)
                 {
                     return type.NextFunc(_serviceProvider, (_, _) => next())(parameter, cancellationToken);
+                }
+
+                if (type.NextMiddlewareFactory is not null)
+                {
+                    return type.NextMiddlewareFactory(parameter).InvokeAsync(parameter, next, cancellationToken);
+                }
+
+                if (type.NextMiddlewareWithProviderFactory is not null)
+                {
+                    return type.NextMiddlewareWithProviderFactory(_serviceProvider, parameter).InvokeAsync(parameter, next, cancellationToken);
                 }
 
                 throw new InvalidOperationException("Invalid pipeline component. No middleware or delegate supplied.");
