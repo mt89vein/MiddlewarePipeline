@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,32 +27,12 @@ namespace Middlewares
                 throw new ArgumentNullException(nameof(middleware));
             }
 
-            return builder.Use((_, next) => (context, cancellationToken) =>
+            return builder.Use(next =>
             {
-                return middleware(context, () => next(context, cancellationToken), cancellationToken);
-            });
-        }
-
-        /// <summary>
-        /// Adds a middleware func to be executed in pipeline.
-        /// </summary>
-        /// <param name="builder">Pipeline builder.</param>
-        /// <param name="middleware">The middleware as func to be executed.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
-        /// <returns>A reference to the builder after the operation has completed.</returns>
-        public static IPipelineBuilder<TParameter> Use<TParameter>(
-            this IPipelineBuilder<TParameter> builder,
-            Func<MiddlewareDelegate<TParameter>, MiddlewareDelegate<TParameter>> middleware
-        )
-        {
-            if (middleware is null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-
-            return builder.Use((_, next) => (context, cancellationToken) =>
-            {
-                return middleware((c, _) => next(c, cancellationToken))(context, cancellationToken);
+                return (context, cancellationToken) =>
+                {
+                    return middleware(context, () => next(context, cancellationToken), cancellationToken);
+                };
             });
         }
     }

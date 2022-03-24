@@ -45,23 +45,6 @@ namespace Middlewares.Tests
         }
 
         [Test]
-        public void Cannot_Register_Invalid_MiddlewareDelegate()
-        {
-            // arrange
-            var services = new ServiceCollection();
-
-            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
-
-            Func<MiddlewareDelegate<TestCtx>, MiddlewareDelegate<TestCtx>> middleware = null;
-
-            // act
-            void TestCode() => pipelineBuilder.Use(middleware!);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(TestCode);
-        }
-
-        [Test]
         public async Task NoOp_WhenPipeline_Empty()
         {
             // arrange
@@ -83,34 +66,20 @@ namespace Middlewares.Tests
         }
 
         [Test]
-        public async Task Executes_With_Register_MiddlewareDelegate()
+        public void Executes_With_MiddlewareDelegate()
         {
             // arrange
-            var services = new ServiceCollection();
+            var pipelineBuilder = new PipelineBuilder<TestCtx>();
 
-            services
-                .ConfigurePipelineFor<TestCtx>()
-                .Use(next =>
-                {
-                    return (ctx, cancellationToken) =>
-                    {
-                        ctx.Msg = "123";
+            pipelineBuilder.Use(middlewareDelegate: next => next);
 
-                        return next(ctx, cancellationToken);
-                    };
-                });
-
-            var sp = services.BuildServiceProvider();
-
-            var pipeline = sp.GetRequiredService<IPipeline<TestCtx>>();
-
-            var testCtx = new TestCtx();
+            var pipeline = pipelineBuilder.Build();
 
             // act
-            await pipeline.ExecuteAsync(testCtx);
+            Task TestCode() => pipeline.ExecuteAsync(new TestCtx(), CancellationToken.None);
 
             // assert
-            Assert.AreEqual("123", testCtx.Msg);
+            Assert.DoesNotThrowAsync(TestCode);
         }
     }
 }

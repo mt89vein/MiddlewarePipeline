@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Middlewares.Tests.TestMiddlewares;
+using Moq;
 using NUnit.Framework;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests
@@ -102,9 +104,45 @@ namespace Middlewares.Tests
         }
 
         [Test]
+        public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate_WithDI(
+            [Values(true, false)] bool predicateResult,
+            [Values(true, false)] bool passNullToPredicate
+        )
+        {
+            // arrange
+            var services = new ServiceCollection();
+            services.AddScoped<Middleware2>();
+
+            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
+
+            Func<TestCtx, bool> predicate = passNullToPredicate
+                ? null
+                : _ => predicateResult;
+            // act
+            void TestCode() => pipelineBuilder.UseWhen<TestCtx, Middleware2>(predicate!);
+
+            // assert
+            if (passNullToPredicate)
+            {
+                Assert.Throws<ArgumentNullException>(TestCode);
+            }
+            else
+            {
+                Assert.DoesNotThrow(TestCode);
+
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    var sp = services.BuildServiceProvider();
+                    await sp.GetRequiredService<IPipeline<TestCtx>>().ExecuteAsync(new TestCtx());
+                });
+            }
+        }
+
+        [Test]
         public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate(
             [Values(true, false)]bool predicateResult,
-            [Values(true, false)]bool passNull
+            [Values(true, false)]bool passNull,
+            [Values(true, false)]bool passNullToPredicate
         )
         {
             // arrange
@@ -116,11 +154,55 @@ namespace Middlewares.Tests
                 ? null
                 : (_, _, _) => Task.CompletedTask;
 
+            Func<TestCtx, bool> predicate = passNullToPredicate
+                ? null
+                : _ => predicateResult;
+
             // act
-            void TestCode() => pipelineBuilder.UseWhen(_ => predicateResult, middleware!);
+            void TestCode() => pipelineBuilder.UseWhen(predicate!, middleware!);
 
             // assert
-            if (passNull)
+            if (passNull || passNullToPredicate)
+            {
+                Assert.Throws<ArgumentNullException>(TestCode);
+            }
+            else
+            {
+                Assert.DoesNotThrow(TestCode);
+
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    var sp = services.BuildServiceProvider();
+                    await sp.GetRequiredService<IPipeline<TestCtx>>().ExecuteAsync(new TestCtx());
+                });
+            }
+        }
+
+        [Test]
+        public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate_Without_ServiceProvider(
+            [Values(true, false)] bool predicateResult,
+            [Values(true, false)] bool passNull,
+            [Values(true, false)] bool passNullToPredicate
+        )
+        {
+            // arrange
+            var services = new ServiceCollection();
+
+            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
+
+            Func<TestCtx, NextMiddleware, CancellationToken, Task> middleware = passNull
+                ? null
+                : (_, _, _) => Task.CompletedTask;
+
+            Func<TestCtx, bool> predicate = passNullToPredicate
+                ? null
+                : _ => predicateResult;
+
+            // act
+            void TestCode() => pipelineBuilder.UseWhen(predicate!, middleware!);
+
+            // assert
+            if (passNull || passNullToPredicate)
             {
                 Assert.Throws<ArgumentNullException>(TestCode);
             }

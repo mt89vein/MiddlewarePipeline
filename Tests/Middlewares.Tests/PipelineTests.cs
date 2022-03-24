@@ -22,7 +22,7 @@ namespace Middlewares.Tests
 
             pipelineBuilder.Use<Middleware1>();
             pipelineBuilder.Use<Middleware2>();
-            pipelineBuilder.Use(async (ctx, next, ct) =>
+            pipelineBuilder.Use(async (ctx, next, _) =>
             {
                 ctx.ExecutedMiddlewaresCount++;
 
@@ -119,6 +119,12 @@ namespace Middlewares.Tests
         public void Should_ThrowArgNull_If_Invalid_ComponentArgFunc()
         {
             Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextFunc: null!));
+        }
+
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentArgFuncWithServiceProvider()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextFuncWithServiceProvider: null!));
         }
     }
 }

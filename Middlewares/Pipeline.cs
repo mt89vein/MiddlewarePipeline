@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,18 +27,13 @@ namespace Middlewares
         private readonly IList<PipelineComponent<TParameter>> _pipelineComponents;
 
         /// <summary>
-        /// Completed middleware.
-        /// </summary>
-        private readonly NextMiddleware _completedMiddleware = () => Task.CompletedTask;
-
-        /// <summary>
         /// Initiates new instance of <see cref="Pipeline{TParameter}"/> class.
         /// </summary>
         /// <param name="serviceProvider">Application service provider.</param>
         /// <param name="pipelineInfoAccessor">Pipeline information accessor.</param>
         /// <exception cref="ArgumentNullException">If ServiceProvider required.</exception>
         public Pipeline(IServiceProvider? serviceProvider, IPipelineInfoAccessor<TParameter> pipelineInfoAccessor)
-            : this(serviceProvider, new List<PipelineComponent<TParameter>>(pipelineInfoAccessor.PipelineComponents))
+            : this(serviceProvider, pipelineInfoAccessor.PipelineComponents)
         {
         }
 
@@ -53,9 +50,10 @@ namespace Middlewares
 
             if (!_pipelineComponents.All(x => x.IsValidComponent()))
             {
-                throw new ArgumentException("Invalid pipeline component detected. No middleware or delegate supplied.");
+                throw new ArgumentException("Invalid pipeline component detected. No middleware or delegate provided.");
             }
 
+            // TODO: internal constructor, который позволит этот кейс протестить
             if (serviceProvider is null && !_pipelineComponents.All(x => x.CanExecuteWithoutServiceProvider()))
             {
                 throw new ArgumentNullException(nameof(serviceProvider),
@@ -76,28 +74,35 @@ namespace Middlewares
             }
 
             var index = 0;
-            var next = _completedMiddleware;
+            NextMiddleware next = EmptyFunc;
+            var sp = _serviceProvider;
+            var pipelineComponents = _pipelineComponents;
 
             next = () =>
             {
-                var type = _pipelineComponents[index];
+                var type = pipelineComponents[index];
 
                 index++;
-                if (index == _pipelineComponents.Count)
+                if (index == pipelineComponents.Count)
                 {
-                    next = _completedMiddleware; // final action
+                    next = EmptyFunc; // final action
                 }
 
                 if (type.NextMiddlewareType is not null)
                 {
-                    var typedMiddleware = (IMiddleware<TParameter>)ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, type.NextMiddlewareType);
+                    var typedMiddleware = (IMiddleware<TParameter>)ActivatorUtilities.GetServiceOrCreateInstance(sp, type.NextMiddlewareType);
 
                     return typedMiddleware.InvokeAsync(parameter, next, cancellationToken);
                 }
 
                 if (type.NextFunc is not null)
                 {
-                    return type.NextFunc(_serviceProvider, (_, _) => next())(parameter, cancellationToken);
+                    return type.NextFunc((_, _) => next())(parameter, cancellationToken);
+                }
+
+                if (type.NextFuncWithServiceProvider is not null)
+                {
+                    return type.NextFuncWithServiceProvider(sp, (_, _) => next())(parameter, cancellationToken);
                 }
 
                 if (type.NextMiddlewareFactory is not null)
@@ -107,7 +112,7 @@ namespace Middlewares
 
                 if (type.NextMiddlewareWithProviderFactory is not null)
                 {
-                    return type.NextMiddlewareWithProviderFactory(_serviceProvider, parameter).InvokeAsync(parameter, next, cancellationToken);
+                    return type.NextMiddlewareWithProviderFactory(sp, parameter).InvokeAsync(parameter, next, cancellationToken);
                 }
 
                 if (type.NextMiddleware is not null)
@@ -115,10 +120,22 @@ namespace Middlewares
                     return type.NextMiddleware.InvokeAsync(parameter, next, cancellationToken);
                 }
 
+                // TODO: internal constructor, который позволит это протестить
+                // unreachable code
                 throw new InvalidOperationException("Invalid pipeline component. No middleware or delegate supplied.");
             };
 
             return next();
+        }
+
+        /// <summary>
+        /// Does nothing. Final action.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Task EmptyFunc()
+        {
+            return Task.CompletedTask;
         }
     }
 }

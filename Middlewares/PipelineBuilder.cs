@@ -84,7 +84,7 @@ namespace Middlewares
         /// <param name="middleware">The middleware as func to be executed.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
         /// <returns>A reference to the builder after the operation has completed.</returns>
-        public IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middleware)
+        public IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegateWithServiceProvider<TParameter> middleware)
         {
             if (middleware is null)
             {
@@ -92,6 +92,24 @@ namespace Middlewares
             }
 
             _pipelineComponents.Add(new PipelineComponent<TParameter>(middleware));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a middleware func to be executed in pipeline.
+        /// </summary>
+        /// <param name="middlewareDelegate">The middleware as func to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareDelegate"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        public IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middlewareDelegate)
+        {
+            if (middlewareDelegate is null)
+            {
+                throw new ArgumentNullException(nameof(middlewareDelegate));
+            }
+
+            _pipelineComponents.Add(new PipelineComponent<TParameter>(middlewareDelegate));
 
             return this;
         }

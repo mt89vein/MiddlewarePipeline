@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Middlewares
 {
@@ -53,9 +53,17 @@ namespace Middlewares
         /// <summary>
         /// Adds a middleware func to be executed in pipeline.
         /// </summary>
-        /// <param name="middleware">The middleware as func to be executed.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middleware"/> is null.</exception>
+        /// <param name="middlewareDelegateWithServiceProvider">The middleware as func to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareDelegateWithServiceProvider"/> is null.</exception>
         /// <returns>A reference to the builder after the operation has completed.</returns>
-        IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middleware);
+        IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegateWithServiceProvider<TParameter> middlewareDelegateWithServiceProvider);
+
+        /// <summary>
+        /// Adds a middleware func to be executed in pipeline.
+        /// </summary>
+        /// <param name="middlewareDelegate">The middleware as func to be executed.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="middlewareDelegate"/> is null.</exception>
+        /// <returns>A reference to the builder after the operation has completed.</returns>
+        IPipelineBuilder<TParameter> Use(FuncAsNextMiddlewareDelegate<TParameter> middlewareDelegate);
     }
 }

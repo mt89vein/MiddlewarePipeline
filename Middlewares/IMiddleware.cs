@@ -17,14 +17,4 @@ namespace Middlewares
         /// <param name="cancellationToken">Cancellation token.</param>
         Task InvokeAsync(TParameter parameter, NextMiddleware next, CancellationToken cancellationToken = default);
     }
-
-    /// <summary>
-    /// Delegate as Middleware.
-    /// </summary>
-    public delegate Task MiddlewareDelegate<TParameter>(TParameter parameter, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Pipeline component.
-    /// </summary>
-    public delegate Task NextMiddleware();
 }

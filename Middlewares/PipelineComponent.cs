@@ -3,38 +3,6 @@
 namespace Middlewares
 {
     /// <summary>
-    /// Next middleware factory delegate with service provider.
-    /// </summary>
-    /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    /// <param name="serviceProvider">DI Service provider.</param>
-    /// <param name="parameter">Pipeline parameter.</param>
-    /// <returns>Middleware.</returns>
-    public delegate IMiddleware<TParameter> ParameterWithServiceProviderAsNextMiddlewareFactoryDelegate<TParameter>(
-        IServiceProvider serviceProvider,
-        TParameter parameter
-    );
-
-    /// <summary>
-    /// Next middleware factory delegate with service provider.
-    /// </summary>
-    /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    /// <param name="parameter">Pipeline parameter.</param>
-    /// <returns>Middleware.</returns>
-    public delegate IMiddleware<TParameter> ParameterAsNextMiddlewareFactoryDelegate<TParameter>(TParameter parameter);
-
-    /// <summary>
-    /// Next middleware factory delegate with service provider.
-    /// </summary>
-    /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
-    /// <param name="serviceProvider">DI Service provider.</param>
-    /// <param name="nextMiddleware">Middleware function.</param>
-    /// <returns>Middleware func.</returns>
-    public delegate MiddlewareDelegate<TParameter> FuncAsNextMiddlewareDelegate<TParameter>(
-        IServiceProvider serviceProvider,
-        MiddlewareDelegate<TParameter> nextMiddleware
-    );
-
-    /// <summary>
     /// Pipeline component.
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
@@ -60,6 +28,11 @@ namespace Middlewares
         /// Next middleware factory.
         /// </summary>
         public ParameterAsNextMiddlewareFactoryDelegate<TParameter>? NextMiddlewareFactory { get; }
+
+        /// <summary>
+        /// Next middleware func with service provider.
+        /// </summary>
+        public FuncAsNextMiddlewareDelegateWithServiceProvider<TParameter>? NextFuncWithServiceProvider { get; }
 
         /// <summary>
         /// Next middleware func.
@@ -110,6 +83,15 @@ namespace Middlewares
         /// <summary>
         /// Initializes a new instance of the <see cref="PipelineComponent{TParameter}"></see> class.
         /// </summary>
+        /// <param name="nextFuncWithServiceProvider">Next middleware func.</param>
+        public PipelineComponent(FuncAsNextMiddlewareDelegateWithServiceProvider<TParameter> nextFuncWithServiceProvider)
+        {
+            NextFuncWithServiceProvider = nextFuncWithServiceProvider ?? throw new ArgumentNullException(nameof(nextFuncWithServiceProvider));
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PipelineComponent{TParameter}"></see> class.
+        /// </summary>
         /// <param name="nextFunc">Next middleware func.</param>
         public PipelineComponent(FuncAsNextMiddlewareDelegate<TParameter> nextFunc)
         {
@@ -121,7 +103,7 @@ namespace Middlewares
         /// </summary>
         internal bool CanExecuteWithoutServiceProvider()
         {
-            return NextMiddleware is not null;
+            return NextMiddleware is not null || NextMiddlewareFactory is not null || NextFunc is not null;
         }
         
         /// <summary>
@@ -133,6 +115,7 @@ namespace Middlewares
                    NextMiddlewareType is not null ||
                    NextMiddlewareFactory is not null ||
                    NextMiddlewareWithProviderFactory is not null ||
+                   NextFuncWithServiceProvider is not null ||
                    NextFunc is not null;
         }
     }

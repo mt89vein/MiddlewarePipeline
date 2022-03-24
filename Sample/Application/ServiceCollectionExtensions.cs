@@ -12,7 +12,7 @@ namespace Application
         {
             var builder = new PipelineBuilder<SomeContext>();
             builder.Use(new SubdomainDetectMiddleware(null));
-            builder.Use(ctx => new SubdomainDetectMiddleware(null));
+            builder.Use((_, _) => new SubdomainDetectMiddleware(null));
 
             builder.Build();
 
@@ -21,7 +21,7 @@ namespace Application
                 .Use<PerfMiddleware<SomeContext>>()
                 .Use<PreconditionCheckMiddleware>()
                 .Use<SubdomainDetectMiddleware>()
-                .Use(_ => new SubdomainDetectMiddleware(null))
+                .Use((_, _) => new SubdomainDetectMiddleware(null))
                 .Use(new SubdomainDetectMiddleware(null))
                 .UseSubdomain1Pipeline()
                 // .UseSubdomain2Pipeline()
