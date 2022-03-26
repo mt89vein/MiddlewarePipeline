@@ -14,7 +14,7 @@ namespace Middlewares
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
     internal class Pipeline<TParameter> : IPipeline<TParameter>
-        where TParameter : class
+        where TParameter : notnull
     {
         /// <summary>
         /// Application service provider.

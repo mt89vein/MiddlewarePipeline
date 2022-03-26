@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -9,7 +9,7 @@ namespace Middlewares
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
     public class PipelineBuilder<TParameter> : IPipelineBuilder<TParameter>, IPipelineInfoAccessor<TParameter>
-        where TParameter : class
+        where TParameter : notnull
     {
         /// <summary>
         /// Pipeline components.

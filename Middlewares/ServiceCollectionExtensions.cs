@@ -18,7 +18,7 @@ namespace Middlewares
         public static IPipelineBuilder<TParameter> ConfigurePipelineFor<TParameter>(
             this IServiceCollection services,
             ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
-        ) where TParameter : class
+        ) where TParameter : notnull
         {
             var builder = new PipelineBuilder<TParameter>();
 

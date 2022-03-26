@@ -7,7 +7,7 @@ namespace Middlewares
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
     internal sealed class PipelineComponent<TParameter>
-        where TParameter : class
+        where TParameter : notnull
     {
         /// <summary>
         /// Next middleware type.

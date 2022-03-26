@@ -7,7 +7,7 @@ namespace Middlewares
     /// </summary>
     /// <typeparam name="TParameter">Pipeline parameter type.</typeparam>
     internal interface IPipelineInfoAccessor<TParameter>
-        where TParameter : class
+        where TParameter : notnull
     {
         /// <summary>
         /// Pipeline components.
