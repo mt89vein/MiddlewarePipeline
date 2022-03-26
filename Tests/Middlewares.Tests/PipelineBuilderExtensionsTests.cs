@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Middlewares.Tests
 {
+    /// <summary>
+    /// Pipeline builder additional extension methods tests.
+    /// </summary>
     [TestOf(typeof(PipelineBuilderExtensions))]
     public class PipelineBuilderExtensionsTests
     {
+        /// <summary>
+        /// Ensures, that we can register correct types, that implements <see cref="IMiddleware{TParameter}"/> interface.
+        /// </summary>
         [Test]
         [TestCase(null, typeof(ArgumentNullException))]
         [TestCase(typeof(TestCtx), typeof(ArgumentException))]
@@ -27,8 +33,11 @@ namespace Middlewares.Tests
             Assert.Throws(exceptionType, TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_Func()
+        public void Should_Throw_ArgumentNullException_If_Null_Passed_As_Middleware_Func()
         {
             // arrange
             var services = new ServiceCollection();
@@ -44,6 +53,9 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Empty pipeline is also valid pipeline.
+        /// </summary>
         [Test]
         public async Task NoOp_WhenPipeline_Empty()
         {
@@ -65,6 +77,9 @@ namespace Middlewares.Tests
             Assert.IsNull(testCtx.Msg);
         }
 
+        /// <summary>
+        /// We can also use delegate as middleware.
+        /// </summary>
         [Test]
         public void Executes_With_MiddlewareDelegate()
         {

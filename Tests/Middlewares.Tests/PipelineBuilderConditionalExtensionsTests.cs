@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Middlewares.Tests.TestMiddlewares;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading;
@@ -8,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Middlewares.Tests
 {
+    /// <summary>
+    /// Pipeline builder additional extension methods tests.
+    /// </summary>
     [TestOf(typeof(PipelineBuilderConditionalExtensions))]
     public class PipelineBuilderConditionalExtensionsTests
     {
+        /// <summary>
+        /// Ensures, that we executing middlewares in correct order.
+        /// </summary>
         [Test]
         public async Task Should_BeCorrect_PipelineExecutionOrder_WithSimpleConditions([Values(true, false)] bool executeMiddleware2)
         {
@@ -56,6 +61,9 @@ namespace Middlewares.Tests
             Assert.AreEqual(expectedExecutedMiddlewaresCount, testContext.ExecutedMiddlewaresCount, "ExecutedMiddlewaresCount is not match");
         }
 
+        /// <summary>
+        /// Ensures, that we executing middlewares in correct order.
+        /// </summary>
         [Test]
         public async Task Should_BeCorrect_PipelineExecutionOrder_WithServiceProviderConditions([Values(true, false)] bool executeMiddleware2)
         {
@@ -103,6 +111,9 @@ namespace Middlewares.Tests
             Assert.AreEqual(expectedExecutedMiddlewaresCount, testContext.ExecutedMiddlewaresCount, "ExecutedMiddlewaresCount is not match");
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate_WithDI(
             [Values(true, false)] bool predicateResult,
@@ -138,6 +149,9 @@ namespace Middlewares.Tests
             }
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate(
             [Values(true, false)]bool predicateResult,
@@ -178,6 +192,9 @@ namespace Middlewares.Tests
             }
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Cannot_Register_Invalid_Conditional_MiddlewareDelegate_Without_ServiceProvider(
             [Values(true, false)] bool predicateResult,

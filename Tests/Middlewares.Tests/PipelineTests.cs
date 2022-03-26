@@ -4,16 +4,20 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests
 {
     /// <summary>
-    /// Pipeline execution order tests.
+    /// Pipeline tests.
     /// </summary>
     [TestOf(typeof(Pipeline<>))]
     public class PipelineTests
     {
+        /// <summary>
+        /// Ensures, that we executing middlewares in correct order.
+        /// </summary>
         [Test]
         public async Task Should_BeCorrect_PipelineExecutionOrder()
         {
@@ -53,6 +57,9 @@ namespace Middlewares.Tests
             Assert.AreEqual(3, testContext.ExecutedMiddlewaresCount, "ExecutedMiddlewaresCount is not match");
         }
 
+        /// <summary>
+        /// Ensures, that we executing middlewares in correct order.
+        /// </summary>
         [Test]
         public async Task Should_BeCorrect_PipelineExecutionOrder_WithDeps()
         {
@@ -91,6 +98,9 @@ namespace Middlewares.Tests
             Assert.IsTrue(dep.Resolved, "Dependency is not resolved");
         }
 
+        /// <summary>
+        /// Ensures, that we don't allow to use invalid pipeline components.
+        /// </summary>
         [Test]
         public void Should_Throw_If_Invalid_Component()
         {
@@ -103,24 +113,56 @@ namespace Middlewares.Tests
                 });
 
             // act
-            void TestCode() => new Pipeline<TestCtx>(null!, pipelineInfoAccessorMock.Object);
+            void TestCode() => _ = new Pipeline<TestCtx>(null!, pipelineInfoAccessorMock.Object);
 
             // assert
             Assert.Throws<ArgumentException>(TestCode);
         }
 
+        /// <summary>
+        /// Ensures, that we don't allow to use invalid pipeline components.
+        /// </summary>
+        [Test]
+        public void Should_Throw_InvalidOperationException_When_PipelineComponent_HasNo_Middleware_Or_Delegate()
+        {
+            // arrange
+            var pipelineComponents = new List<PipelineComponent<TestCtx>>
+            {
+                new PipelineComponent<TestCtx>() // invalid instance
+            };
+
+            Assert.IsTrue(pipelineComponents.TrueForAll(t => !t.IsValidComponent()), "All components must be invalid, before we pass it to pipeline.");
+
+            var pipeline = new Pipeline<TestCtx>(pipelineComponents);
+
+            // act
+            void TestCode() => pipeline.ExecuteAsync(new TestCtx(), CancellationToken.None);
+
+            // assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Should_ThrowArgNull_If_Invalid_ComponentArgType()
         {
             Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextMiddlewareType: null!));
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Should_ThrowArgNull_If_Invalid_ComponentArgFunc()
         {
             Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextFunc: null!));
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
         public void Should_ThrowArgNull_If_Invalid_ComponentArgFuncWithServiceProvider()
         {

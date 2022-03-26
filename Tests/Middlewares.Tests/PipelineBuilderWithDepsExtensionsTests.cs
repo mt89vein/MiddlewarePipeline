@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 
 namespace Middlewares.Tests
 {
+    /// <summary>
+    /// Pipeline builder additional extension methods tests.
+    /// </summary>
     [TestOf(typeof(PipelineBuilderWithDepsExtensions))]
     public class PipelineBuilderWithDepsExtensionsTests
     {
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_Func_WithSingleDep()
+        public void Should_Throw_ArgumentNullException_When_Invalid_Func_WithSingleDep_Provided()
         {
             // arrange
             var services = new ServiceCollection();
@@ -26,6 +32,49 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
+        [Test]
+        public void Should_Throw_ArgumentNullException_When_Invalid_Func_WithThreeDeps_Provided()
+        {
+            // arrange
+            var services = new ServiceCollection();
+
+            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
+
+            Func<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
+
+            // act
+            void TestCode() => pipelineBuilder.Use(middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        /// <summary>
+        /// Null checks.
+        /// </summary>
+        [Test]
+        public void Should_Throw_ArgumentNullException_When_Invalid_Func_WithTwoDeps_Provided()
+        {
+            // arrange
+            var services = new ServiceCollection();
+
+            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
+
+            Func<TestCtx, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
+
+            // act
+            void TestCode() => pipelineBuilder.Use(middleware!);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        /// <summary>
+        /// Ensures, that we resolve and pass to pipeline requested deps.
+        /// </summary>
         [Test]
         public async Task Correctly_Resolves_SingleDep()
         {
@@ -58,23 +107,9 @@ namespace Middlewares.Tests
             Assert.IsTrue(dep.Resolved, "Dependency flag resolved is not true");
         }
 
-        [Test]
-        public void Cannot_Register_Invalid_Func_WithTwoDeps()
-        {
-            // arrange
-            var services = new ServiceCollection();
-
-            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
-
-            Func<TestCtx, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
-
-            // act
-            void TestCode() => pipelineBuilder.Use(middleware!);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(TestCode);
-        }
-
+        /// <summary>
+        /// Ensures, that we resolve and pass to pipeline requested deps.
+        /// </summary>
         [Test]
         public async Task Correctly_Resolves_TwoDeps()
         {
@@ -109,23 +144,9 @@ namespace Middlewares.Tests
             Assert.IsTrue(dep.Resolved, "Dependency flag resolved is not true");
         }
 
-        [Test]
-        public void Cannot_Register_Invalid_Func_WithThreeDeps()
-        {
-            // arrange
-            var services = new ServiceCollection();
-
-            var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
-
-            Func<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
-
-            // act
-            void TestCode() => pipelineBuilder.Use(middleware!);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(TestCode);
-        }
-
+        /// <summary>
+        /// Ensures, that we resolve and pass to pipeline requested deps.
+        /// </summary>
         [Test]
         public async Task Correctly_Resolves_ThreeDeps()
         {

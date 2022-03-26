@@ -2,15 +2,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests
 {
+    /// <summary>
+    /// Testing pipeline builder functionality.
+    /// </summary>
     [TestOf(typeof(PipelineBuilder<>))]
     public class PipelineBuilderTests
     {
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_Middleware()
+        public void Should_Throw_ArgumentNullException_When_Invalid_Middleware_Provided()
         {
             // arrange
             var services = new ServiceCollection();
@@ -24,8 +31,11 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_MiddlewareDelegate()
+        public void Should_Throw_ArgumentNullException_When_Invalid_MiddlewareDelegate_Provided()
         {
             // arrange
             var services = new ServiceCollection();
@@ -41,8 +51,11 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_MiddlewareDelegate_Without_ServiceProvider()
+        public void Should_Throw_ArgumentNullException_When_Invalid_MiddlewareDelegate_Provided_Without_ServiceProvider()
         {
             // arrange
             var services = new ServiceCollection();
@@ -58,8 +71,11 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_MiddlewareFactory_Without_ServiceProvider()
+        public void Should_Throw_ArgumentNullException_When_Invalid_MiddlewareFactory_Provided_Without_ServiceProvider()
         {
             // arrange
             var services = new ServiceCollection();
@@ -75,8 +91,11 @@ namespace Middlewares.Tests
             Assert.Throws<ArgumentNullException>(TestCode);
         }
 
+        /// <summary>
+        /// Null checks.
+        /// </summary>
         [Test]
-        public void Cannot_Register_Invalid_MiddlewareFactory()
+        public void Should_Throw_ArgumentNullException_When_Invalid_MiddlewareFactory_Provided()
         {
             // arrange
             var services = new ServiceCollection();
@@ -137,8 +156,7 @@ namespace Middlewares.Tests
         }
 
         /// <summary>
-        /// <see cref="PipelineBuilder{TParameter}.Build(IServiceProvider)"/> creates <see cref="IPipeline{TParameter}"/>
-        /// with current set of <see cref="PipelineComponent{TParameter}"/>, and should not affect on further PipelineBuilder changes.
+        /// We should allow to use pipeline builder without service provider, if it not used in any of middlewares.
         /// </summary>
         [Test]
         public async Task Pipeline_Executes_Without_ServiceProvider()
@@ -177,6 +195,21 @@ namespace Middlewares.Tests
                 "Before_Middleware1Before_LambdaMiddlewareBefore_ConditionalLambdaMiddlewareAfter_ConditionalLambdaMiddlewareAfter_LambdaMiddlewareAfter_Middleware1",
                 testContext.Msg
             );
+        }
+
+        /// <summary>
+        /// We should not allow to use pipeline builder without service provider, if it required in one of middlewares.
+        /// </summary>
+        [Test]
+        public void Pipeline_Should_Throw_ArgumentNullException_When_It_Cannot_Be_Executed_Without_ServiceProvider()
+        {
+            // arrange
+            var pipelineBuilder = new PipelineBuilder<TestCtx>();
+
+            pipelineBuilder.Use<Middleware1>();
+
+            // act & assert
+            Assert.Throws<ArgumentNullException>(() => pipelineBuilder.Build());
         }
 
         /// <summary>
@@ -225,10 +258,14 @@ namespace Middlewares.Tests
             pipelineBuilder.Use((_, next, _) => next());
 
             // act
-            void TestCode() => pipelineBuilder.Build();
+            Task TestCode()
+            {
+                var pipeline = pipelineBuilder.Build();
+                return pipeline.ExecuteAsync(new TestCtx(), CancellationToken.None);
+            }
 
             // assert
-            Assert.DoesNotThrow(TestCode);
+            Assert.DoesNotThrowAsync(TestCode);
         }
 
         /// <summary>
