@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -154,6 +154,8 @@ namespace Middlewares
         /// Creates <see cref="IPipeline{TParameter}"/> from current pipeline components.
         /// </summary>
         /// <param name="serviceProvider">Application service provider.</param>
+        /// <exception cref="ArgumentException">Throws, when invalid pipeline component detected.</exception>
+        /// <exception cref="ArgumentNullException">Throws, when ServiceProvider is required.</exception>
         /// <returns>Pipeline.</returns>
         public IPipeline<TParameter> Build(IServiceProvider? serviceProvider = null)
         {
