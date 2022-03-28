@@ -168,5 +168,32 @@ namespace Middlewares.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(nextFuncWithServiceProvider: null!));
         }
+
+        /// <summary>
+        /// Null checks.
+        /// </summary>
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentMiddlewareInstance()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(middleware: null!));
+        }
+
+        /// <summary>
+        /// Null checks.
+        /// </summary>
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentMiddlewareFactory()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(middlewareFactory: (ParameterAsNextMiddlewareFactoryDelegate<TestCtx>)null));
+        }
+
+        /// <summary>
+        /// Null checks.
+        /// </summary>
+        [Test]
+        public void Should_ThrowArgNull_If_Invalid_ComponentMiddlewareFactory_WithServiceProvider()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PipelineComponent<TestCtx>(middlewareFactory: (ParameterWithServiceProviderAsNextMiddlewareFactoryDelegate<TestCtx>)null));
+        }
     }
 }
