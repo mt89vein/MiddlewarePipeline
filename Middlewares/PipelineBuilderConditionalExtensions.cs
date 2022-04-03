@@ -51,7 +51,7 @@ namespace Middlewares
         public static IPipelineBuilder<TParameter> UseWhen<TParameter>(
             this IPipelineBuilder<TParameter> builder,
             Func<TParameter, bool> predicate,
-            Func<IServiceProvider, TParameter, Func<Task>, Task> middleware
+            Func<IServiceProvider, TParameter, Func<Task>, CancellationToken, Task> middleware
         )
             where TParameter : class
         {
@@ -69,7 +69,7 @@ namespace Middlewares
             {
                 if (predicate(context))
                 {
-                    return middleware(sp, context, () => next(context, cancellationToken));
+                    return middleware(sp, context, () => next(context, cancellationToken), cancellationToken);
                 }
 
                 return next(context, cancellationToken);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares
@@ -18,7 +19,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> Use<TParameter, TDep1>(
             this IPipelineBuilder<TParameter> builder,
-            Func<TParameter, TDep1, Func<Task>, Task> middleware
+            Func<TParameter, TDep1, Func<Task>, CancellationToken, Task> middleware
         )
             where TParameter : class
             where TDep1 : notnull
@@ -32,7 +33,7 @@ namespace Middlewares
             {
                 var dep1 = sp.GetRequiredService<TDep1>();
 
-                return middleware(context, dep1, () => next(context, cancellationToken));
+                return middleware(context, dep1, () => next(context, cancellationToken), cancellationToken);
             });
         }
 
@@ -45,7 +46,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> Use<TParameter, TDep1, TDep2>(
             this IPipelineBuilder<TParameter> builder,
-            Func<TParameter, TDep1, TDep2, Func<Task>, Task> middleware
+            Func<TParameter, TDep1, TDep2, Func<Task>, CancellationToken, Task> middleware
         )
             where TParameter : class
             where TDep1 : notnull
@@ -61,7 +62,7 @@ namespace Middlewares
                 var dep1 = sp.GetRequiredService<TDep1>();
                 var dep2 = sp.GetRequiredService<TDep2>();
 
-                return middleware(context, dep1, dep2, () => next(context, cancellationToken));
+                return middleware(context, dep1, dep2, () => next(context, cancellationToken), cancellationToken);
             });
         }
 
@@ -74,7 +75,7 @@ namespace Middlewares
         /// <returns>A reference to the builder after the operation has completed.</returns>
         public static IPipelineBuilder<TParameter> Use<TParameter, TDep1, TDep2, TDep3>(
             this IPipelineBuilder<TParameter> builder,
-            Func<TParameter, TDep1, TDep2, TDep3, Func<Task>, Task> middleware
+            Func<TParameter, TDep1, TDep2, TDep3, Func<Task>, CancellationToken, Task> middleware
         )
             where TParameter : class
             where TDep1 : notnull
@@ -92,7 +93,7 @@ namespace Middlewares
                 var dep2 = sp.GetRequiredService<TDep2>();
                 var dep3 = sp.GetRequiredService<TDep3>();
 
-                return middleware(context, dep1, dep2, dep3, () => next(context, cancellationToken));
+                return middleware(context, dep1, dep2, dep3, () => next(context, cancellationToken), cancellationToken);
             });
         }
     }

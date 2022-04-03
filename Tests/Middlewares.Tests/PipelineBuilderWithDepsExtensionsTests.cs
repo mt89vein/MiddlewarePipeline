@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Middlewares.Tests.TestMiddlewares;
 using NUnit.Framework;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Middlewares.Tests
@@ -23,7 +24,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<TestCtx, ExampleDependency, Func<Task>, Task> middleware = null;
+            Func<TestCtx, ExampleDependency, Func<Task>, CancellationToken, Task> middleware = null;
 
             // act
             void TestCode() => pipelineBuilder.Use(middleware!);
@@ -43,7 +44,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
+            Func<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency, Func<Task>, CancellationToken, Task> middleware = null;
 
             // act
             void TestCode() => pipelineBuilder.Use(middleware!);
@@ -63,7 +64,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<TestCtx, ExampleDependency, ExampleDependency, Func<Task>, Task> middleware = null;
+            Func<TestCtx, ExampleDependency, ExampleDependency, Func<Task>, CancellationToken, Task> middleware = null;
 
             // act
             void TestCode() => pipelineBuilder.Use(middleware!);
@@ -89,7 +90,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            pipelineBuilder.Use<TestCtx, ExampleDependency>((_, dependency, next) =>
+            pipelineBuilder.Use<TestCtx, ExampleDependency>((_, dependency, next, _) =>
             {
                 dependency.Resolved = true;
 
@@ -124,7 +125,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            pipelineBuilder.Use<TestCtx, ExampleDependency, ExampleDependency>((_, dependency1, dependency2, next) =>
+            pipelineBuilder.Use<TestCtx, ExampleDependency, ExampleDependency>((_, dependency1, dependency2, next, _) =>
             {
                 dependency1.Resolved = true;
 
@@ -161,7 +162,7 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            pipelineBuilder.Use<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency>((_, dependency1, dependency2, dependency3, next) =>
+            pipelineBuilder.Use<TestCtx, ExampleDependency, ExampleDependency, ExampleDependency>((_, dependency1, dependency2, dependency3, next, _) =>
             {
                 dependency1.Resolved = true;
 

@@ -71,7 +71,7 @@ namespace Middlewares.Tests
             var pipelineBuilder = new PipelineBuilder<TestCtx>();
 
             pipelineBuilder.Use<Middleware1>();
-            pipelineBuilder.UseWhen(ctx => ctx.ExecuteMiddleware2, async (_, ctx, next) =>
+            pipelineBuilder.UseWhen(ctx => ctx.ExecuteMiddleware2, async (_, ctx, next, _) =>
             {
                 ctx.ExecutedMiddlewaresCount++;
 
@@ -164,9 +164,9 @@ namespace Middlewares.Tests
 
             var pipelineBuilder = services.ConfigurePipelineFor<TestCtx>();
 
-            Func<IServiceProvider, TestCtx, Func<Task>, Task> middleware = passNull
+            Func<IServiceProvider, TestCtx, Func<Task>, CancellationToken, Task> middleware = passNull
                 ? null
-                : (_, _, _) => Task.CompletedTask;
+                : (_, _, _, _) => Task.CompletedTask;
 
             Func<TestCtx, bool> predicate = passNullToPredicate
                 ? null

@@ -74,7 +74,7 @@ namespace Middlewares.Tests
 
             pipelineBuilder.Use<Middleware1>();
             pipelineBuilder.Use<Middleware2>();
-            pipelineBuilder.Use<TestCtx, ExampleDependency>(async (ctx, deps, next) =>
+            pipelineBuilder.Use<TestCtx, ExampleDependency>(async (ctx, deps, next, _) =>
             {
                 ctx.ExecutedMiddlewaresCount++;
                 deps.Resolved = true;
