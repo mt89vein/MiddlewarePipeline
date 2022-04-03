@@ -7,7 +7,9 @@ MiddlewarePipeline
 
 Set of classes and interfaces for configuring and executing custom pipeline using middleware pattern.
 
-If you familiar with [ASP.NET Core HttpContext pipeline and middlewares](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/?view=aspnetcore-5.0), then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
+If you familiar with ASP.NET Core HttpContext pipeline and middlewares, then you will notice that this library is the similar thing, but aimed at building your custom pipelines using power of middlewares.
+
+[![ASP.NET Core middleware pipeline execution order](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/index/_static/request-delegate-pipeline.png)](https://docs.microsoft.com/en-US/aspnet/core/fundamentals/middleware/)
 
 Look at unit tests for additional usage examples.
 
@@ -15,15 +17,15 @@ Look at unit tests for additional usage examples.
 
 You should install [MiddlewarePipeline with NuGet](https://www.nuget.org/packages/MiddlewarePipeline):
 
-    Install-Package MiddlewarePipeline -Version 1.1.0
+    Install-Package MiddlewarePipeline -Version 2.0.0
 
 via the .NET Core command line interface:
 
-    dotnet add package MiddlewarePipeline --version 1.1.0
+    dotnet add package MiddlewarePipeline --version 2.0.0
 
 or package reference
 
-    <PackageReference Include="MiddlewarePipeline" Version="1.1.0" />
+    <PackageReference Include="MiddlewarePipeline" Version="2.0.0" />
 
 ## Use cases
 
@@ -66,7 +68,7 @@ services.ConfigurePipelineFor<Param>()
         .Use<SubdomainDetectMiddleware>() // should define, which subdomain must handle request
         .UseWhen<Param, FirstMiddleware>(p => p.Type = SubDomainType.First) // when predicate returns true, then FirstMiddleware will be executed
         .UseWhen<Param, SecondMiddleware>(p => p.Type = SubDomainType.Second)
-        .Use<CommonFinalyzeMiddleware>(); // finalization of pipeline
+        .Use<CommonFinalizeMiddleware>(); // finalization of pipeline
 
 // as you can see, it is very easy to add custom logic in any part of request execution
 
@@ -122,7 +124,7 @@ look at [Manually build pipeline section](#manually-build-pipeline) or [ServiceC
 ```csharp
 services.ConfigurePipelineFor<Param>()
     /* other middlewares */
-    .Use(async (param, next) =>
+    .Use(async (param, next, cancellationToken) =>
     {
         // before
 
@@ -163,7 +165,7 @@ services.AddTransient<Dependency>();
 services.ConfigurePipelineFor<Param>()
     /* other middlewares */
     // inject dependencies from DI (up to 3)
-    .Use<Param, Dependency>(async (param, dependency, next) =>
+    .Use<Param, Dependency>(async (param, dependency, next, cancellationToken) =>
     {
         // before
 
@@ -173,6 +175,7 @@ services.ConfigurePipelineFor<Param>()
     });
     /* other middlewares */
 ```
+
 ### Conditional middleware execution
 
 CondMiddleware is only executed if its predicate returns true.
@@ -191,7 +194,7 @@ Same as above, but here lambda as conditional middleware
  ```csharp
 services.ConfigurePipelineFor<Param>()
     /* other middlewares */
-    .UseWhen(p => p.ShouldExecute(), async (sp, ctx, next) =>
+    .UseWhen(p => p.ShouldExecute(), async (ctx, next, cancellationToken) =>
     {
         // before
 
@@ -249,6 +252,7 @@ private static IPipeline<Param> BuildPipeline(IServiceProvider sp)
 
     return pipelineBuilder.Build(sp);
 }
+
 ```
 and register in common pipeline:
 
@@ -261,6 +265,26 @@ services.ConfigurePipelineFor<Param>()
 +   .UseFirstSubdomainPipeline()
     .UseSecondSubdomainPipeline();
     /* other middlewares */;
+```
+
+### Using pipeline without IServiceProvider:
+
+```csharp
+var pipelineBuilder = new PipelineBuilder<TestCtx>();
+
+pipelineBuilder
+    .Use(_ => new Middleware1())
+    .Use(async (ctx, next, cancellationToken) => {
+
+        // do something
+        await next();
+        // do more
+    });
+
+pipeline = pipelineBuilder.Build();
+// build method checks for ServiceProvider requirement in any of registered middlewares.
+
+await pipeline.ExecuteAsync(new TestCtx(), CancellationToken.None);
 ```
 
 ### Contribute
