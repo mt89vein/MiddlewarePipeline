@@ -10,12 +10,6 @@ namespace Application
     {
         public static void AddPipeline(this IServiceCollection services)
         {
-            var builder = new PipelineBuilder<SomeContext>();
-            builder.Use(new SubdomainDetectMiddleware(null));
-            builder.Use((_, _) => new SubdomainDetectMiddleware(null));
-
-            builder.Build();
-
             services.ConfigurePipelineFor<SomeContext>()
                 .Use<UnhandledExceptionMiddleware<SomeContext>>()
                 .Use<PerfMiddleware<SomeContext>>()
